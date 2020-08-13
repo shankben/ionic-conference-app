@@ -21,7 +21,7 @@ import darkStyle from './map-dark-style';
 export class MapPage implements AfterViewInit {
   @ViewChild('mapCanvas', { static: true }) mapElement: ElementRef;
 
-  private readonly apiKey = 'AIzaSyB8pf6ZdFQj5qw7rc_HSGrhUwQKfIe9ICw'; // TODO
+  private readonly apiKey = 'AIzaSyBIl1Acu5SlLIAXPEOUJLQIXOC-lBNJWs8';
 
   constructor(
     @Inject(DOCUMENT) private doc: Document,
@@ -36,7 +36,8 @@ export class MapPage implements AfterViewInit {
       return Promise.resolve(googleModule.maps);
     }
     const script = document.createElement('script');
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${this.apiKey}&v=3.31`;
+    script.src = 'https://maps.googleapis.com/maps/api/js?' +
+      `key=${this.apiKey}&libraries=&v=weekly`;
     script.async = true;
     script.defer = true;
     document.body.appendChild(script);

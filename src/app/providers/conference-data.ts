@@ -1,9 +1,18 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { AngularFirestore } from '@angular/fire/firestore';
+
 import { of } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { map, toArray } from 'rxjs/operators';
 
 import { UserData } from './user-data';
+
+
+interface Track {
+  name: string;
+  icon: string;
+}
+
 
 @Injectable({
   providedIn: 'root'
@@ -11,7 +20,11 @@ import { UserData } from './user-data';
 export class ConferenceData {
   data: any;
 
-  constructor(public http: HttpClient, public user: UserData) {}
+  constructor(
+    public http: HttpClient,
+    public user: UserData,
+    public firestore: AngularFirestore
+  ) { }
 
   load(): any {
     if (this.data) {
@@ -24,22 +37,15 @@ export class ConferenceData {
   }
 
   processData(data: any) {
-    // just some good 'ol JS fun with objects and arrays
-    // build up the data by linking speakers to sessions
     this.data = data;
-
-    // loop through each day in the schedule
     this.data.schedule.forEach((day: any) => {
-      // loop through each timeline group in the day
       day.groups.forEach((group: any) => {
-        // loop through each session in the timeline group
         group.sessions.forEach((session: any) => {
           session.speakers = [];
           if (session.speakerNames) {
             session.speakerNames.forEach((speakerName: any) => {
-              const speaker = this.data.speakers.find(
-                (s: any) => s.name === speakerName
-              );
+              const speaker = this.data.speakers.find((it: any) =>
+                it.name === speakerName);
               if (speaker) {
                 session.speakers.push(speaker);
                 speaker.sessions = speaker.sessions || [];
@@ -54,39 +60,53 @@ export class ConferenceData {
     return this.data;
   }
 
+
+  getSessionById(sessionId: string) {
+    return this.firestore
+      .collection('sessions', (ref) => ref.limit(1)
+        .where('id', '==', sessionId))
+      .valueChanges();
+  }
+
   getTimeline(
     dayIndex: number,
     queryText = '',
     excludeTracks: any[] = [],
     segment = 'all'
   ) {
-    return this.load().pipe(
-      map((data: any) => {
-        const day = data.schedule[dayIndex];
-        day.shownSessions = 0;
-
-        queryText = queryText.toLowerCase().replace(/,|\.|-/g, ' ');
-        const queryWords = queryText.split(' ')
-          .filter((it) => !!it.trim().length);
-
-        day.groups.forEach((group: any) => {
-          group.hide = true;
-
-          group.sessions.forEach((session: any) => {
-            // check if this session should show or not
-            this.filterSession(session, queryWords, excludeTracks, segment);
-
-            if (!session.hide) {
-              // if this session is not hidden then this group should show
-              group.hide = false;
-              day.shownSessions++;
-            }
-          });
+    queryText = queryText.toLowerCase().replace(/,|\.|-/g, ' ');
+    const queryWords = queryText.split(' ').filter((it) => !!it.trim().length);
+    const groups = new Map();
+    return this.firestore.collection('sessions').get().pipe(map(({ docs }) => {
+      let shownSessions = 0;
+      docs
+        .map((it) => it.data())
+        .sort((x, y) => x.groupId <= y.groupId ? -1 : 1)
+        .map((session) => {
+          this.filterSession(session, queryWords, excludeTracks, segment);
+          if (!groups.has(session.groupId)) {
+            groups.set(session.groupId, {
+              hide: true,
+              sessions: []
+            });
+          }
+          const group = groups.get(session.groupId);
+          if (!('time' in group) || group.time > session.timeStart) {
+            group.time = session.timeStart;
+          }
+          group.sessions.push(session);
+          if (!session.hide) {
+            group.hide = false;
+            ++shownSessions;
+          }
+          return session;
         });
 
-        return day;
-      })
-    );
+      return {
+        shownSessions,
+        groups: Array.from(groups.values())
+      };
+    }));
   }
 
   filterSession(
@@ -97,19 +117,15 @@ export class ConferenceData {
   ) {
     let matchesQueryText = false;
     if (queryWords.length) {
-      // of any query word is in the session name than it passes the query test
-      queryWords.forEach((queryWord: string) => {
-        if (session.name.toLowerCase().indexOf(queryWord) > -1) {
+      queryWords.forEach((it: string) => {
+        if (session.name.toLowerCase().indexOf(it) > -1) {
           matchesQueryText = true;
         }
       });
     } else {
-      // if there are no query words then this session passes the query test
       matchesQueryText = true;
     }
 
-    // if any of the sessions tracks are not in the
-    // exclude tracks then this session passes the track test
     let matchesTracks = false;
     session.tracks.forEach((trackName: string) => {
       if (excludeTracks.indexOf(trackName) === -1) {
@@ -117,8 +133,6 @@ export class ConferenceData {
       }
     });
 
-    // if the segment is 'favorites', but session is not a user favorite
-    // then this session does not pass the segment test
     let matchesSegment = false;
     if (segment === 'favorites') {
       if (this.user.hasFavorite(session.name)) {
@@ -128,35 +142,20 @@ export class ConferenceData {
       matchesSegment = true;
     }
 
-    // all tests must be true if it should not be hidden
     session.hide = !(matchesQueryText && matchesTracks && matchesSegment);
   }
 
   getSpeakers() {
-    return this.load().pipe(
-      map((data: any) => {
-        return data.speakers.sort((a: any, b: any) => {
-          const aName = a.name.split(' ').pop();
-          const bName = b.name.split(' ').pop();
-          return aName.localeCompare(bName);
-        });
-      })
-    );
+    return this.firestore
+      .collection('speakers', (ref) => ref.orderBy('name'))
+      .valueChanges();
   }
 
   getTracks() {
-    return this.load().pipe(
-      map((data: any) => {
-        return data.tracks.sort();
-      })
-    );
+    return this.firestore.collection('tracks').valueChanges();
   }
 
   getMap() {
-    return this.load().pipe(
-      map((data: any) => {
-        return data.map;
-      })
-    );
+    return this.firestore.collection('map').valueChanges();
   }
 }

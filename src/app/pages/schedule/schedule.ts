@@ -48,12 +48,10 @@ export class SchedulePage implements OnInit {
 
   ngOnInit() {
     this.updateSchedule();
-
     this.ios = this.config.get('mode') === 'ios';
   }
 
   updateSchedule() {
-    // Close any open sliding items when the schedule updates
     if (this.scheduleList) {
       this.scheduleList.closeSlidingItems();
     }
@@ -64,6 +62,7 @@ export class SchedulePage implements OnInit {
       this.excludeTracks,
       this.segment
     ).subscribe((data: any) => {
+      console.log(data);
       this.shownSessions = data.shownSessions;
       this.groups = data.groups;
     });

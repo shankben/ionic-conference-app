@@ -27,10 +27,10 @@ export class ScheduleFilterPage {
     const excludedTrackNames = this.navParams.get('excludedTracks');
 
     this.confData.getTracks().subscribe((tracks: any[]) => {
+      console.log(tracks);
       tracks.forEach((track) => {
         this.tracks.push({
-          name: track.name,
-          icon: track.icon,
+          ...track,
           isChecked: (excludedTrackNames.indexOf(track.name) === -1)
         });
       });

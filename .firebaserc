@@ -1,5 +1,14 @@
 {
   "projects": {
-    "default": "ionic-ng-conf-app"
+    "default": "ionic-conference-demo"
+  },
+  "targets": {
+    "ionic-conference-demo": {
+      "hosting": {
+        "app": [
+          "ionic-conference-demo"
+        ]
+      }
+    }
   }
 }

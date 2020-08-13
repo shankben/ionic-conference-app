@@ -1,13 +1,11 @@
+import { MenuController, Platform, ToastController } from '@ionic/angular';
+import { SplashScreen } from '@ionic-native/splash-screen/ngx';
+import { StatusBar } from '@ionic-native/status-bar/ngx';
+import { Storage } from '@ionic/storage';
+
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { Router } from '@angular/router';
 import { SwUpdate } from '@angular/service-worker';
-
-import { MenuController, Platform, ToastController } from '@ionic/angular';
-
-import { SplashScreen } from '@ionic-native/splash-screen/ngx';
-import { StatusBar } from '@ionic-native/status-bar/ngx';
-
-import { Storage } from '@ionic/storage';
 
 import { UserData } from './providers/user-data';
 
@@ -18,28 +16,6 @@ import { UserData } from './providers/user-data';
   encapsulation: ViewEncapsulation.None
 })
 export class AppComponent implements OnInit {
-  appPages = [
-    {
-      title: 'Schedule',
-      url: '/app/tabs/schedule',
-      icon: 'calendar'
-    },
-    {
-      title: 'Speakers',
-      url: '/app/tabs/speakers',
-      icon: 'people'
-    },
-    {
-      title: 'Map',
-      url: '/app/tabs/map',
-      icon: 'map'
-    },
-    {
-      title: 'About',
-      url: '/app/tabs/about',
-      icon: 'information-circle'
-    }
-  ];
   loggedIn = false;
   dark = false;
 
@@ -60,7 +36,7 @@ export class AppComponent implements OnInit {
   async ngOnInit() {
     this.checkLoginStatus();
     this.listenForLoginEvents();
-    this.swUpdate.available.subscribe(async (res) => {
+    this.swUpdate.available.subscribe(async () => {
       const toast = await this.toastCtrl.create({
         message: 'Update available!',
         position: 'bottom',
@@ -73,7 +49,7 @@ export class AppComponent implements OnInit {
       });
       await toast.present();
       await toast.onDidDismiss();
-      await this.swUpdate.activateUpdate()
+      await this.swUpdate.activateUpdate();
       window.location.reload();
     });
   }
@@ -90,23 +66,16 @@ export class AppComponent implements OnInit {
   }
 
   updateLoggedInStatus(loggedIn: boolean) {
-    setTimeout(() => {
-      this.loggedIn = loggedIn;
-    }, 300);
+    setTimeout(() => this.loggedIn = loggedIn, 300);
   }
 
   listenForLoginEvents() {
-    window.addEventListener('user:login', () => {
-      this.updateLoggedInStatus(true);
-    });
-
-    window.addEventListener('user:signup', () => {
-      this.updateLoggedInStatus(true);
-    });
-
-    window.addEventListener('user:logout', () => {
-      this.updateLoggedInStatus(false);
-    });
+    window.addEventListener('user:login', () =>
+      this.updateLoggedInStatus(true));
+    window.addEventListener('user:signup', () =>
+      this.updateLoggedInStatus(true));
+    window.addEventListener('user:logout', () =>
+      this.updateLoggedInStatus(false));
   }
 
   async logout() {

@@ -1,9 +1,17 @@
-import { Component, ElementRef, Inject, ViewChild, AfterViewInit } from '@angular/core';
-import { ConferenceData } from '../../providers/conference-data';
 import { Platform } from '@ionic/angular';
+
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  Inject,
+  ViewChild
+} from '@angular/core';
+
 import { DOCUMENT} from '@angular/common';
 
-import { darkStyle } from './map-dark-style';
+import { ConferenceData } from '../../providers/conference-data';
+import darkStyle from './map-dark-style';
 
 @Component({
   selector: 'page-map',
@@ -13,10 +21,34 @@ import { darkStyle } from './map-dark-style';
 export class MapPage implements AfterViewInit {
   @ViewChild('mapCanvas', { static: true }) mapElement: ElementRef;
 
+  private readonly apiKey = 'AIzaSyB8pf6ZdFQj5qw7rc_HSGrhUwQKfIe9ICw'; // TODO
+
   constructor(
     @Inject(DOCUMENT) private doc: Document,
     public confData: ConferenceData,
-    public platform: Platform) {}
+    public platform: Platform
+  ) {}
+
+  private getGoogleMaps(): Promise<any> {
+    const win = window as any;
+    const googleModule = win.google;
+    if (googleModule && googleModule.maps) {
+      return Promise.resolve(googleModule.maps);
+    }
+    const script = document.createElement('script');
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${this.apiKey}&v=3.31`;
+    script.async = true;
+    script.defer = true;
+    document.body.appendChild(script);
+    return new Promise((resolve, reject) => script.onload = () => {
+      const googleModule2 = win.google;
+      if (googleModule2 && googleModule2.maps) {
+        resolve(googleModule2.maps);
+      } else {
+        reject('google maps not available');
+      }
+    });
+  }
 
   async ngAfterViewInit() {
     const appEl = this.doc.querySelector('ion-app');
@@ -26,11 +58,9 @@ export class MapPage implements AfterViewInit {
       style = darkStyle;
     }
 
-    const googleMaps = await getGoogleMaps(
-      'AIzaSyB8pf6ZdFQj5qw7rc_HSGrhUwQKfIe9ICw'
-    );
+    const googleMaps = await this.getGoogleMaps();
 
-    let map;
+    let map: any;
 
     this.confData.getMap().subscribe((mapData: any) => {
       const mapEle = this.mapElement.nativeElement;
@@ -52,14 +82,14 @@ export class MapPage implements AfterViewInit {
           title: markerData.name
         });
 
-        marker.addListener('click', () => {
-          infoWindow.open(map, marker);
-        });
+        marker.addListener('click', () => infoWindow.open(map, marker));
       });
 
-      googleMaps.event.addListenerOnce(map, 'idle', () => {
-        mapEle.classList.add('show-map');
-      });
+      googleMaps.event.addListenerOnce(
+        map,
+        'idle',
+        () => mapEle.classList.add('show-map')
+      );
     });
 
     const observer = new MutationObserver((mutations) => {
@@ -80,28 +110,3 @@ export class MapPage implements AfterViewInit {
     });
   }
 }
-
-function getGoogleMaps(apiKey: string): Promise<any> {
-  const win = window as any;
-  const googleModule = win.google;
-  if (googleModule && googleModule.maps) {
-    return Promise.resolve(googleModule.maps);
-  }
-
-  return new Promise((resolve, reject) => {
-    const script = document.createElement('script');
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&v=3.31`;
-    script.async = true;
-    script.defer = true;
-    document.body.appendChild(script);
-    script.onload = () => {
-      const googleModule2 = win.google;
-      if (googleModule2 && googleModule2.maps) {
-        resolve(googleModule2.maps);
-      } else {
-        reject('google maps not available');
-      }
-    };
-  });
-}
-

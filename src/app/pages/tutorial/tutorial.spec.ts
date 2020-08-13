@@ -7,7 +7,8 @@ import { TutorialPage } from './tutorial';
 
 import { IonicStorageModule } from '@ionic/storage';
 describe('TutorialPage', () => {
-  let fixture, app;
+  let fixture;
+  let app;
   beforeEach(async(() => {
     const menuSpy = jasmine.createSpyObj('MenuController', [
       'toggle',

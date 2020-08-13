@@ -1,6 +1,15 @@
 import { Component, ViewChild, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { AlertController, IonList, IonRouterOutlet, LoadingController, ModalController, ToastController, Config } from '@ionic/angular';
+
+import {
+  AlertController,
+  IonList,
+  IonRouterOutlet,
+  LoadingController,
+  ModalController,
+  ToastController,
+  Config
+} from '@ionic/angular';
 
 import { ScheduleFilterPage } from '../schedule-filter/schedule-filter';
 import { ConferenceData } from '../../providers/conference-data';
@@ -49,7 +58,12 @@ export class SchedulePage implements OnInit {
       this.scheduleList.closeSlidingItems();
     }
 
-    this.confData.getTimeline(this.dayIndex, this.queryText, this.excludeTracks, this.segment).subscribe((data: any) => {
+    this.confData.getTimeline(
+      this.dayIndex,
+      this.queryText,
+      this.excludeTracks,
+      this.segment
+    ).subscribe((data: any) => {
       this.shownSessions = data.shownSessions;
       this.groups = data.groups;
     });
@@ -98,7 +112,11 @@ export class SchedulePage implements OnInit {
 
   }
 
-  async removeFavorite(slidingItem: HTMLIonItemSlidingElement, sessionData: any, title: string) {
+  async removeFavorite(
+    slidingItem: HTMLIonItemSlidingElement,
+    sessionData: any,
+    title: string
+  ) {
     const alert = await this.alertCtrl.create({
       header: title,
       message: 'Would you like to remove this session from your favorites?',

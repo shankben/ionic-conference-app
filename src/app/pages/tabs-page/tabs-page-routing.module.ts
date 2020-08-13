@@ -3,7 +3,6 @@ import { RouterModule, Routes } from '@angular/router';
 import { TabsPage } from './tabs-page';
 import { SchedulePage } from '../schedule/schedule';
 
-
 const routes: Routes = [
   {
     path: 'tabs',
@@ -64,8 +63,7 @@ const routes: Routes = [
           {
             path: '',
             loadChildren: async () =>
-              (await import('../about/about.module'))
-              .AboutModule
+              (await import('../about/about.module')).AboutModule
           }
         ]
       },

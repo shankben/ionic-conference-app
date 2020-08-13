@@ -9,28 +9,40 @@ const routes: Routes = [
     pathMatch: 'full'
   },
   {
+    path: 'app',
+    loadChildren: async () =>
+      (await import('./pages/tabs-page/tabs-page.module'))
+      .TabsModule
+  },
+  {
     path: 'account',
-    loadChildren: async () => (await import('./pages/account/account.module')).AccountModule
+    loadChildren: async () =>
+      (await import('./pages/account/account.module'))
+      .AccountModule
   },
   {
     path: 'support',
-    loadChildren: async () => (await import('./pages/support/support.module')).SupportModule
+    loadChildren: async () =>
+      (await import('./pages/support/support.module'))
+      .SupportModule
   },
   {
     path: 'login',
-    loadChildren: async () => (await import('./pages/login/login.module')).LoginModule
+    loadChildren: async () =>
+      (await import('./pages/login/login.module'))
+      .LoginModule
   },
   {
     path: 'signup',
-    loadChildren: async () => (await import('./pages/signup/signup.module')).SignUpModule
-  },
-  {
-    path: 'app',
-    loadChildren: async () => (await import('./pages/tabs-page/tabs-page.module')).TabsModule
+    loadChildren: async () =>
+      (await import('./pages/signup/signup.module'))
+      .SignUpModule
   },
   {
     path: 'tutorial',
-    loadChildren: async () => (await import('./pages/tutorial/tutorial.module')).TutorialModule,
+    loadChildren: async () =>
+      (await import('./pages/tutorial/tutorial.module'))
+      .TutorialModule,
     canLoad: [CheckTutorial]
   }
 ];

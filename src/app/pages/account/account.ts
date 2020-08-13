@@ -1,7 +1,7 @@
+import { AlertController } from '@ionic/angular';
+
 import { AfterViewInit, Component } from '@angular/core';
 import { Router } from '@angular/router';
-
-import { AlertController } from '@ionic/angular';
 
 import { UserData } from '../../providers/user-data';
 

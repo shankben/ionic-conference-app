@@ -25,7 +25,7 @@ import { SpeakerListModule } from '../speaker-list/speaker-list.module';
     TabsPageRoutingModule
   ],
   declarations: [
-    TabsPage,
+    TabsPage
   ]
 })
 export class TabsModule { }

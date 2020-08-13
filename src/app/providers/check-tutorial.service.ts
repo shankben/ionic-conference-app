@@ -6,7 +6,7 @@ import { Storage } from '@ionic/storage';
 })
 export class CheckTutorial implements CanLoad {
   constructor(private storage: Storage, private router: Router) {
-    
+
   }
 
   async canLoad() {

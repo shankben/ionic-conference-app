@@ -60,8 +60,7 @@ export class AppComponent implements OnInit {
   async ngOnInit() {
     this.checkLoginStatus();
     this.listenForLoginEvents();
-
-    this.swUpdate.available.subscribe(async res => {
+    this.swUpdate.available.subscribe(async (res) => {
       const toast = await this.toastCtrl.create({
         message: 'Update available!',
         position: 'bottom',
@@ -72,27 +71,22 @@ export class AppComponent implements OnInit {
           }
         ]
       });
-
       await toast.present();
-
-      toast
-        .onDidDismiss()
-        .then(() => this.swUpdate.activateUpdate())
-        .then(() => window.location.reload());
+      await toast.onDidDismiss();
+      await this.swUpdate.activateUpdate()
+      window.location.reload();
     });
   }
 
-  initializeApp() {
-    this.platform.ready().then(() => {
-      this.statusBar.styleDefault();
-      this.splashScreen.hide();
-    });
+  async initializeApp() {
+    await this.platform.ready();
+    this.statusBar.styleDefault();
+    this.splashScreen.hide();
   }
 
-  checkLoginStatus() {
-    return this.userData.isLoggedIn().then(loggedIn => {
-      return this.updateLoggedInStatus(loggedIn);
-    });
+  async checkLoginStatus() {
+    const loggedIn = await this.userData.isLoggedIn();
+    return this.updateLoggedInStatus(loggedIn);
   }
 
   updateLoggedInStatus(loggedIn: boolean) {
@@ -115,10 +109,9 @@ export class AppComponent implements OnInit {
     });
   }
 
-  logout() {
-    this.userData.logout().then(() => {
-      return this.router.navigateByUrl('/app/tabs/schedule');
-    });
+  async logout() {
+    await this.userData.logout();
+    return this.router.navigateByUrl('/app/tabs/schedule');
   }
 
   openTutorial() {

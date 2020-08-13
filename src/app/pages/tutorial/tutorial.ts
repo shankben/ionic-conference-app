@@ -21,25 +21,20 @@ export class TutorialPage {
     public storage: Storage
   ) {}
 
-  startApp() {
-    this.router
-      .navigateByUrl('/app/tabs/schedule', { replaceUrl: true })
-      .then(() => this.storage.set('ion_did_tutorial', true));
+  async startApp() {
+    await this.router.navigateByUrl('/app/tabs/schedule', { replaceUrl: true });
+    this.storage.set('ion_did_tutorial', true);
   }
 
-  onSlideChangeStart(event) {
-    event.target.isEnd().then(isEnd => {
-      this.showSkip = !isEnd;
-    });
+  async onSlideChangeStart(event: any) {
+    this.showSkip = await event.target.isEnd();
   }
 
-  ionViewWillEnter() {
-    this.storage.get('ion_did_tutorial').then(res => {
-      if (res === true) {
-        this.router.navigateByUrl('/app/tabs/schedule', { replaceUrl: true });
-      }
-    });
-
+  async ionViewWillEnter() {
+    const res = await this.storage.get('ion_did_tutorial');
+    if (res === true) {
+      this.router.navigateByUrl('/app/tabs/schedule', { replaceUrl: true });
+    }
     this.menu.enable(false);
   }
 

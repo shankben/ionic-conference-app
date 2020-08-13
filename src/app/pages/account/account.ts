@@ -56,10 +56,8 @@ export class AccountPage implements AfterViewInit {
     await alert.present();
   }
 
-  getUsername() {
-    this.userData.getUsername().then((username) => {
-      this.username = username;
-    });
+  async getUsername() {
+    this.username = await this.userData.getUsername();
   }
 
   changePassword() {

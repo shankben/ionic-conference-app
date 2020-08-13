@@ -18,7 +18,9 @@ const routes: Routes = [
           },
           {
             path: 'session/:sessionId',
-            loadChildren: () => import('../session-detail/session-detail.module').then(m => m.SessionDetailModule)
+            loadChildren: async () =>
+              (await import('../session-detail/session-detail.module'))
+              .SessionDetailModule
           }
         ]
       },
@@ -27,15 +29,21 @@ const routes: Routes = [
         children: [
           {
             path: '',
-            loadChildren: () => import('../speaker-list/speaker-list.module').then(m => m.SpeakerListModule)
+            loadChildren: async () =>
+              (await import('../speaker-list/speaker-list.module'))
+              .SpeakerListModule
           },
           {
             path: 'session/:sessionId',
-            loadChildren: () => import('../session-detail/session-detail.module').then(m => m.SessionDetailModule)
+            loadChildren: async () =>
+              (await import('../session-detail/session-detail.module'))
+              .SessionDetailModule
           },
           {
             path: 'speaker-details/:speakerId',
-            loadChildren: () => import('../speaker-detail/speaker-detail.module').then(m => m.SpeakerDetailModule)
+            loadChildren: async () =>
+              (await import('../speaker-detail/speaker-detail.module'))
+              .SpeakerDetailModule
           }
         ]
       },
@@ -44,7 +52,9 @@ const routes: Routes = [
         children: [
           {
             path: '',
-            loadChildren: () => import('../map/map.module').then(m => m.MapModule)
+            loadChildren: async () =>
+              (await import('../map/map.module'))
+              .MapModule
           }
         ]
       },
@@ -53,7 +63,9 @@ const routes: Routes = [
         children: [
           {
             path: '',
-            loadChildren: () => import('../about/about.module').then(m => m.AboutModule)
+            loadChildren: async () =>
+              (await import('../about/about.module'))
+              .AboutModule
           }
         ]
       },
@@ -71,4 +83,3 @@ const routes: Routes = [
   exports: [RouterModule]
 })
 export class TabsPageRoutingModule { }
-

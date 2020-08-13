@@ -15,37 +15,17 @@ export class SessionDetailPage {
   defaultHref = '';
 
   constructor(
-    private dataProvider: ConferenceData,
+    private conferenceData: ConferenceData,
     private userProvider: UserData,
     private route: ActivatedRoute
   ) { }
 
   ionViewWillEnter() {
     const sessionId = this.route.snapshot.paramMap.get('sessionId');
-    this.dataProvider.getSessionById(sessionId).subscribe((it) => {
+    this.conferenceData.getSessionById(sessionId).subscribe((it) => {
       this.session = it.shift();
       this.isFavorite = this.userProvider.hasFavorite(this.session.name);
     });
-
-    // this.dataProvider.load().subscribe((data: any) => {
-    //   if (data && data.schedule && data.schedule[0] && data.schedule[0].groups) {
-    //     for (const group of data.schedule[0].groups) {
-    //       if (group && group.sessions) {
-    //         for (const session of group.sessions) {
-    //           if (session && session.id === sessionId) {
-    //             this.session = session;
-    //
-    //             this.isFavorite = this.userProvider.hasFavorite(
-    //               this.session.name
-    //             );
-    //
-    //             break;
-    //           }
-    //         }
-    //       }
-    //     }
-    //   }
-    // });
   }
 
   ionViewDidEnter() {

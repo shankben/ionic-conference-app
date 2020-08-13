@@ -26,41 +26,6 @@ export class ConferenceData {
     public firestore: AngularFirestore
   ) { }
 
-  load(): any {
-    if (this.data) {
-      return of(this.data);
-    } else {
-      return this.http
-        .get('assets/data/data.json')
-        .pipe(map(this.processData, this));
-    }
-  }
-
-  processData(data: any) {
-    this.data = data;
-    this.data.schedule.forEach((day: any) => {
-      day.groups.forEach((group: any) => {
-        group.sessions.forEach((session: any) => {
-          session.speakers = [];
-          if (session.speakerNames) {
-            session.speakerNames.forEach((speakerName: any) => {
-              const speaker = this.data.speakers.find((it: any) =>
-                it.name === speakerName);
-              if (speaker) {
-                session.speakers.push(speaker);
-                speaker.sessions = speaker.sessions || [];
-                speaker.sessions.push(session);
-              }
-            });
-          }
-        });
-      });
-    });
-
-    return this.data;
-  }
-
-
   getSessionById(sessionId: string) {
     return this.firestore
       .collection('sessions', (ref) => ref.limit(1)
@@ -68,7 +33,7 @@ export class ConferenceData {
       .valueChanges();
   }
 
-  getTimeline(
+  getSessions(
     dayIndex: number,
     queryText = '',
     excludeTracks: any[] = [],
@@ -145,6 +110,13 @@ export class ConferenceData {
     session.hide = !(matchesQueryText && matchesTracks && matchesSegment);
   }
 
+  getSpeakerById(speakerId: string) {
+    return this.firestore
+      .collection('speakers', (ref) => ref.limit(1)
+        .where('id', '==', speakerId))
+      .valueChanges();
+  }
+
   getSpeakers() {
     return this.firestore
       .collection('speakers', (ref) => ref.orderBy('name'))
@@ -155,7 +127,7 @@ export class ConferenceData {
     return this.firestore.collection('tracks').valueChanges();
   }
 
-  getMap() {
-    return this.firestore.collection('map').valueChanges();
+  getLocations() {
+    return this.firestore.collection('locations').valueChanges();
   }
 }

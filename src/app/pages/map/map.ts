@@ -25,7 +25,7 @@ export class MapPage implements AfterViewInit {
 
   constructor(
     @Inject(DOCUMENT) private doc: Document,
-    public confData: ConferenceData,
+    public conferenceData: ConferenceData,
     public platform: Platform
   ) {}
 
@@ -62,16 +62,16 @@ export class MapPage implements AfterViewInit {
 
     let map: any;
 
-    this.confData.getMap().subscribe((mapData: any) => {
+    this.conferenceData.getLocations().subscribe((locations: any) => {
       const mapEle = this.mapElement.nativeElement;
 
       map = new googleMaps.Map(mapEle, {
-        center: mapData.find((d: any) => d.center),
+        center: locations.find((d: any) => d.center),
         zoom: 16,
         styles: style
       });
 
-      mapData.forEach((markerData: any) => {
+      locations.forEach((markerData: any) => {
         const infoWindow = new googleMaps.InfoWindow({
           content: `<h5>${markerData.name}</h5>`
         });
@@ -105,6 +105,7 @@ export class MapPage implements AfterViewInit {
         }
       });
     });
+
     observer.observe(appEl, {
       attributes: true
     });

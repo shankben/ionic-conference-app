@@ -15,7 +15,7 @@ export class ScheduleFilterPage {
   tracks: {name: string, icon: string, isChecked: boolean}[] = [];
 
   constructor(
-    public confData: ConferenceData,
+    public conferenceData: ConferenceData,
     private config: Config,
     public modalCtrl: ModalController,
     public navParams: NavParams
@@ -26,7 +26,7 @@ export class ScheduleFilterPage {
 
     const excludedTrackNames = this.navParams.get('excludedTracks');
 
-    this.confData.getTracks().subscribe((tracks: any[]) => {
+    this.conferenceData.getTracks().subscribe((tracks: any[]) => {
       console.log(tracks);
       tracks.forEach((track) => {
         this.tracks.push({

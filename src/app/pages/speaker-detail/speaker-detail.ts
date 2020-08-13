@@ -13,25 +13,16 @@ export class SpeakerDetailPage {
   speaker: any;
 
   constructor(
-    private dataProvider: ConferenceData,
     private route: ActivatedRoute,
     public actionSheetCtrl: ActionSheetController,
-    public confData: ConferenceData,
+    public conferenceData: ConferenceData,
     public inAppBrowser: InAppBrowser,
   ) {}
 
   ionViewWillEnter() {
-    this.dataProvider.load().subscribe((data: any) => {
-      const speakerId = this.route.snapshot.paramMap.get('speakerId');
-      if (data && data.speakers) {
-        for (const speaker of data.speakers) {
-          if (speaker && speaker.id === speakerId) {
-            this.speaker = speaker;
-            break;
-          }
-        }
-      }
-    });
+    const speakerId = this.route.snapshot.paramMap.get('speakerId');
+    this.conferenceData.getSpeakerById(speakerId)
+      .subscribe((it) => this.speaker = it.shift());
   }
 
   openExternalUrl(url: string) {

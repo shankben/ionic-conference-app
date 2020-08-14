@@ -13,6 +13,8 @@ import { DOCUMENT} from '@angular/common';
 import { ConferenceData } from '../../providers/conference-data';
 import darkStyle from './map-dark-style';
 
+import googleApiKey from '../../../../secrets/google-api-key';
+
 @Component({
   selector: 'page-map',
   templateUrl: 'map.html',
@@ -21,13 +23,11 @@ import darkStyle from './map-dark-style';
 export class MapPage implements AfterViewInit {
   @ViewChild('mapCanvas', { static: true }) mapElement: ElementRef;
 
-  private readonly apiKey = 'AIzaSyBIl1Acu5SlLIAXPEOUJLQIXOC-lBNJWs8';
-
   constructor(
     @Inject(DOCUMENT) private doc: Document,
     public conferenceData: ConferenceData,
     public platform: Platform
-  ) {}
+  ) { }
 
   private getGoogleMaps(): Promise<any> {
     const win = window as any;
@@ -37,7 +37,7 @@ export class MapPage implements AfterViewInit {
     }
     const script = document.createElement('script');
     script.src = 'https://maps.googleapis.com/maps/api/js?' +
-      `key=${this.apiKey}&libraries=&v=weekly`;
+      `key=${googleApiKey}&libraries=&v=weekly`;
     script.async = true;
     script.defer = true;
     document.body.appendChild(script);

@@ -83,7 +83,7 @@ export class AppComponent implements OnInit {
     return this.router.navigateByUrl('/app/tabs/schedule');
   }
 
-  openTutorial() {
+  async openTutorial() {
     this.menu.enable(false);
     this.storage.set('ion_did_tutorial', false);
     this.router.navigateByUrl('/tutorial');

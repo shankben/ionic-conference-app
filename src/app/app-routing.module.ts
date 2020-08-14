@@ -6,7 +6,7 @@ const routes: Routes = [
   {
     path: '',
     redirectTo: '/tutorial',
-    pathMatch: 'full'
+    pathMatch: 'full',
   },
   {
     path: 'app',

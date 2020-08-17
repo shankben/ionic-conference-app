@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Storage } from '@ionic/storage';
 import * as firebase from 'firebase/app';
 import 'firebase/auth';
+import 'firebase/storage';
 
 import { UserOptions, UserUpdate } from '../interfaces/user-options';
 import { environment } from '../../environments/environment';
@@ -37,13 +38,22 @@ export class UserData {
     if (!user) {
       return;
     }
-    const { displayName } = userOptions;
-    if (!displayName) {
-      return;
+    const { displayName, profilePicture } = userOptions;
+    if (displayName) {
+      await user.updateProfile({ displayName });
     }
-    await user.updateProfile({
-      displayName
-    });
+    if (profilePicture) {
+      const bucket = firebase.storage().ref();
+      try {
+        const uid = firebase.auth().currentUser.uid;
+        const ref = bucket.child(`/users/${uid}/profilePicture.jpg`);
+        await ref.put(profilePicture);
+        const photoURL = await ref.getDownloadURL();
+        await user.updateProfile({ photoURL });
+      } catch (err) {
+        console.error(err);
+      }
+    }
   }
 
   constructor(public storage: Storage) {

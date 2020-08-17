@@ -1,8 +1,6 @@
 import { AlertController } from '@ionic/angular';
-
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-
 import { UserData } from '../../providers/user-data';
 
 
@@ -23,8 +21,10 @@ export class AccountPage {
     window.addEventListener('user:login', () => this.user = this.userData.user);
   }
 
-  updatePicture() {
-    console.log('Clicked to update picture');
+  async profilePictureChange(ev: Event) {
+    const fileInput = ev.target as HTMLInputElement;
+    const file = Array.from(fileInput.files).pop();
+    await this.userData.updateUser({ profilePicture: file });
   }
 
   async changeUsername() {

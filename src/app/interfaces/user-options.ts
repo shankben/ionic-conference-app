@@ -5,4 +5,5 @@ export interface UserOptions {
 
 export interface UserUpdate {
   displayName?: string;
+  profilePicture?: File;
 }

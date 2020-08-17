@@ -19,6 +19,12 @@ export class AppComponent implements OnInit {
   loggedIn = false;
   dark = false;
 
+  async initializeApp() {
+    await this.platform.ready();
+    this.statusBar.styleDefault();
+    this.splashScreen.hide();
+  }
+
   constructor(
     private menu: MenuController,
     private platform: Platform,
@@ -52,12 +58,6 @@ export class AppComponent implements OnInit {
       await this.swUpdate.activateUpdate();
       window.location.reload();
     });
-  }
-
-  async initializeApp() {
-    await this.platform.ready();
-    this.statusBar.styleDefault();
-    this.splashScreen.hide();
   }
 
   async checkLoginStatus() {

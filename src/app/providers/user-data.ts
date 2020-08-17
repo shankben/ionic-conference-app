@@ -1,17 +1,55 @@
 import { Injectable } from '@angular/core';
 import { Storage } from '@ionic/storage';
+import * as firebase from 'firebase/app';
+import 'firebase/auth';
+
+import { UserOptions, UserUpdate } from '../interfaces/user-options';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserData {
   favorites: string[] = [];
-  HAS_LOGGED_IN = 'hasLoggedIn';
   HAS_SEEN_TUTORIAL = 'hasSeenTutorial';
 
-  constructor(
-    public storage: Storage
-  ) { }
+  private onAuthStateChanged(user: any) {
+    if (user) {
+      window.dispatchEvent(new CustomEvent('user:login'));
+      // console.log({
+      //   displayName: user.displayName,
+      //   email: user.email,
+      //   emailVerified: user.emailVerified,
+      //   photoURL: user.photoURL,
+      //   isAnonymous: user.isAnonymous,
+      //   uid: user.uid,
+      //   providerData: user.providerData
+      // });
+    }
+  }
+
+  get user(): any {
+    return firebase.auth().currentUser;
+  }
+
+  async updateUser(userOptions: UserUpdate) {
+    const user = firebase.auth().currentUser;
+    if (!user) {
+      return;
+    }
+    const { displayName } = userOptions;
+    if (!displayName) {
+      return;
+    }
+    await user.updateProfile({
+      displayName
+    });
+  }
+
+  constructor(public storage: Storage) {
+    firebase.initializeApp(environment.firebase);
+    firebase.auth().onAuthStateChanged(this.onAuthStateChanged);
+  }
 
   hasFavorite(sessionName: string): boolean {
     return (this.favorites.indexOf(sessionName) > -1);
@@ -28,34 +66,36 @@ export class UserData {
     }
   }
 
-  async login(username: string): Promise<any> {
-    await this.storage.set(this.HAS_LOGGED_IN, true);
-    this.setUsername(username);
-    return window.dispatchEvent(new CustomEvent('user:login'));
-  }
-
-  async signup(username: string): Promise<any> {
-    await this.storage.set(this.HAS_LOGGED_IN, true);
-    this.setUsername(username);
-    return window.dispatchEvent(new CustomEvent('user:signup'));
+  async login(userOptions: UserOptions): Promise<any> {
+    const { email, password } = userOptions;
+    try {
+      await firebase.auth().signInWithEmailAndPassword(email, password);
+      return window.dispatchEvent(new CustomEvent('user:login'));
+    } catch (err) {
+      console.error(err);
+    }
   }
 
   async logout(): Promise<any> {
-    await this.storage.remove(this.HAS_LOGGED_IN);
-    await this.storage.remove('username');
+    if (firebase.auth().currentUser) {
+      firebase.auth().signOut();
+    }
     window.dispatchEvent(new CustomEvent('user:logout'));
   }
 
-  setUsername(username: string): Promise<any> {
-    return this.storage.set('username', username);
-  }
-
-  async getUsername(): Promise<string> {
-    return await this.storage.get('username');
+  async signup(userOptions: UserOptions): Promise<any> {
+    const { email, password } = userOptions;
+    try {
+      await firebase.auth().createUserWithEmailAndPassword(email, password);
+      await firebase.auth().currentUser.sendEmailVerification();
+      return window.dispatchEvent(new CustomEvent('user:signup'));
+    } catch (err) {
+      console.error(err);
+    }
   }
 
   async isLoggedIn(): Promise<boolean> {
-    return (await this.storage.get(this.HAS_LOGGED_IN)) === true;
+    return Boolean(firebase.auth().currentUser);
   }
 
   async checkHasSeenTutorial(): Promise<string> {

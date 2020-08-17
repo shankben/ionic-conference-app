@@ -12,7 +12,7 @@ import { UserOptions } from '../../interfaces/user-options';
 })
 export class LoginPage {
   login: UserOptions = {
-    username: '',
+    email: '',
     password: ''
   };
 
@@ -26,7 +26,7 @@ export class LoginPage {
   onLogin(form: NgForm) {
     this.submitted = true;
     if (form.valid) {
-      this.userData.login(this.login.username);
+      this.userData.login(this.login);
       this.router.navigateByUrl('/app/tabs/schedule');
     }
   }

@@ -9,30 +9,37 @@
 
 <ion-content>
   <div *ngIf="user" class="ion-padding-top ion-text-center">
-
-    <!-- <img src="https://www.gravatar.com/avatar?d=mm&s=140" alt="avatar"> -->
-
     <img [src]="user.photoURL" alt="avatar" />
-
     <h2>{{ user.displayName || user.email }}</h2>
-
     <ion-list inset>
-      <ion-item>
-        <!-- <ion-label color="primary" stacked>
-          Change Picture
-        </ion-label> -->
+      <ion-item button detail="false">
+        Change Profile Picture
         <ion-input
-          #fileInput
+          id="fileInput"
           type="file"
           accept="image/*"
           multiple="false"
           (change)="profilePictureChange($event)">
         </ion-input>
       </ion-item>
-
-      <ion-item (click)="changeUsername()">Change Username</ion-item>
-      <ion-item (click)="changePassword()">Change Password</ion-item>
-      <ion-item (click)="logout()">Logout</ion-item>
+      <ion-item
+        button
+        detail="false"
+        (click)="changeUsername()">
+        Change Username
+      </ion-item>
+      <ion-item
+        button
+        detail="false"
+        (click)="changePassword()">
+        Change Password
+      </ion-item>
+      <ion-item
+        button
+        detail="false"
+        (click)="logout()">
+        Logout
+      </ion-item>
     </ion-list>
   </div>
 </ion-content>

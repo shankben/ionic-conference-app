@@ -29,7 +29,16 @@
               routerLinkActive="active"
               routerDirection="root"
               detail="false">
-              <ion-icon slot="start" name="person"></ion-icon>
+
+              <ion-avatar *ngIf="user && user.photoURL; else person">
+                <img [src]="user.photoURL" alt="avatar" />
+              </ion-avatar>
+
+              <ng-template #person>
+                <ion-icon *ngElse slot="start" name="person"></ion-icon>
+              </ng-template>
+
+
               <ion-label>
                 Account
               </ion-label>

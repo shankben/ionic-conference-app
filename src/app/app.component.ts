@@ -18,11 +18,14 @@ import { UserData } from './providers/user-data';
 export class AppComponent implements OnInit {
   loggedIn = false;
   dark = false;
+  user: any;
 
   async initializeApp() {
     await this.platform.ready();
     this.statusBar.styleDefault();
     this.splashScreen.hide();
+    this.user = this.userData.user;
+    window.addEventListener('user:login', () => this.user = this.userData.user);
   }
 
   constructor(

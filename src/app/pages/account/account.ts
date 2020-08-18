@@ -34,11 +34,9 @@ export class AccountPage {
         'Cancel',
         {
           text: 'OK',
-          handler: ({ username }: any) => {
-            this.userData
-              .updateUser({ displayName: username })
-              .catch(console.error);
-          }
+          handler: ({ username }: any) => this.userData
+            .updateUser({ displayName: username })
+            .catch(console.error)
         }
       ],
       inputs: [

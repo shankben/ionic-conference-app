@@ -21,13 +21,16 @@ export class LoginPage {
   constructor(
     public userData: UserData,
     public router: Router
-  ) { }
+  ) {
+    window.addEventListener('user:login', () => {
+      this.router.navigateByUrl('/app/tabs/schedule');
+    });
+  }
 
   onLogin(form: NgForm) {
     this.submitted = true;
     if (form.valid) {
       this.userData.login(this.login);
-      this.router.navigateByUrl('/app/tabs/schedule');
     }
   }
 

@@ -9,17 +9,18 @@ import { UserOptions, UserUpdate } from '../../interfaces/user-options';
 @Injectable({ providedIn: 'root' })
 export class AmplifyUserData {
   get user(): any {
-    return null;
+    return Auth.currentAuthenticatedUser();
   }
 
   constructor(public storage: Storage) {
     Amplify.configure({
       Auth: {
-        identityPoolId: 'XX-XXXX-X:XXXXXXXX-XXXX-1234-abcd-1234567890ab',
-        region: 'XX-XXXX-X',
-        identityPoolRegion: 'XX-XXXX-X',
-        userPoolId: 'XX-XXXX-X_abcd1234',
-        userPoolWebClientId: 'a1b2c3d4e5f6g7h8i9j0k1l2m3'
+        region: 'us-east-1',
+        identityPoolId: 'us-east-1:43df0876-52de-46b8-bbb0-0209445e5779',
+        identityPoolRegion: 'us-east-1',
+        userPoolId: 'us-east-1_ozNoY9c4M',
+        userPoolWebClientId: 'tlh2ffuk2tqmjackppd2oh2gs',
+        authenticationFlowType: 'USER_PASSWORD_AUTH'
       }
     });
   }
@@ -29,7 +30,7 @@ export class AmplifyUserData {
   async login(userOptions: UserOptions): Promise<any> {
     const { email, password } = userOptions;
     try {
-      // call signIn
+      await Auth.signIn(email, password);
       return window.dispatchEvent(new CustomEvent('user:login'));
     } catch (err) {
       console.error(err);

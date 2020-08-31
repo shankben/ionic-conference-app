@@ -1,20 +1,12 @@
 import { Injectable } from '@angular/core';
 import { Storage } from '@ionic/storage';
-
 import Amplify, { Auth } from 'aws-amplify';
-
 import { UserOptions, UserUpdate } from '../../interfaces/user-options';
 import { User } from '../../interfaces/user';
 
-import { APIService } from './API.service';
-
-
 @Injectable({ providedIn: 'root' })
 export class AmplifyUserData {
-  constructor(
-    public storage: Storage,
-    public appSyncService: APIService
-  ) {
+  constructor(public storage: Storage) {
     Amplify.configure({
       aws_appsync_graphqlEndpoint: 'https://v5x3hir3ujcjjmh2leisksak2e.appsync-api.us-east-1.amazonaws.com/graphql',
       aws_appsync_region: 'us-east-1',

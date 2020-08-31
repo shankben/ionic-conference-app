@@ -17,7 +17,7 @@ export class SpeakerDetailPage {
     public actionSheetCtrl: ActionSheetController,
     public conferenceData: ConferenceData,
     public inAppBrowser: InAppBrowser,
-  ) {}
+  ) { }
 
   ionViewWillEnter() {
     const speakerId = this.route.snapshot.paramMap.get('speakerId');

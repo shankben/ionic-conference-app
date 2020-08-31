@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { AmplifyConferenceData } from './amplify/conference-data';
 import { FirebaseConferenceData } from './firebase/conference-data';
@@ -17,7 +18,7 @@ export class ConferenceData {
       amplifyProvider;
   }
 
-  getSessionById(sessionId: string) {
+  getSessionById(sessionId: string): Observable<any> {
     return this.provider.getSessionById(sessionId);
   }
 
@@ -35,7 +36,7 @@ export class ConferenceData {
     );
   }
 
-  getSpeakerById(speakerId: string) {
+  getSpeakerById(speakerId: string): Observable<any>  {
     return this.provider.getSpeakerById(speakerId);
   }
 

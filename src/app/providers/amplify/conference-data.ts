@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { from, of } from 'rxjs';
+import { Observable, from, of } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 import { UserData } from '../user-data';
@@ -53,7 +53,7 @@ export class AmplifyConferenceData {
     public appSyncService: APIService
   ) { }
 
-  getSessionById(sessionId: string) {
+  getSessionById(sessionId: string): Observable<any> {
     throw new Error(`Implement getSessionById(${sessionId})`);
   }
 
@@ -62,7 +62,10 @@ export class AmplifyConferenceData {
     queryText = '',
     excludeTracks: any[] = [],
     segment = 'all'
-  ) {
+  ): Observable<{
+    shownSessions: number,
+    groups: any[]
+  }> {
     queryText = queryText.toLowerCase().replace(/,|\.|-/g, ' ');
     const queryWords = queryText.split(' ').filter((it) => !!it.trim().length);
     const groups = new Map();
@@ -76,7 +79,7 @@ export class AmplifyConferenceData {
           if (!groups.has(session.groupId)) {
             groups.set(session.groupId, {
               hide: true,
-              sessions: []
+              sessions: [] as Session[]
             });
           }
           const group = groups.get(session.groupId);

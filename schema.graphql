@@ -1,0 +1,59 @@
+﻿schema {
+  query: Query
+}
+
+type Location {
+  center: Boolean
+  lat: Float!
+  lng: Float!
+  name: String!
+  updatedAt: AWSDateTime!
+}
+
+type Query {
+  getLocation(key: String): Location
+  getSession(key: String): Session
+  getSpeaker(key: String): Speaker
+  getTrack(key: String): Track
+  listLocations: [Location]
+  listSessions: [Session]
+  listSpeakers: [Speaker]
+  listTracks: [Track]
+}
+
+type Session {
+  complexList: AWSJSON
+  date: String!
+  description: String
+  document: AWSJSON
+  groupId: String!
+  id: String!
+  listOfDocs: AWSJSON
+  location: String!
+  name: String!
+  speakerNames: [String!]
+  timeEnd: String!
+  timeStart: String!
+  tracks: [String!]!
+  updatedAt: AWSDateTime!
+}
+
+type Speaker {
+  about: String!
+  email: String!
+  id: String!
+  instagram: String!
+  location: String!
+  name: String!
+  phone: String!
+  profilePic: String!
+  title: String!
+  twitter: String!
+  updatedAt: AWSDateTime!
+}
+
+type Track {
+  icon: String!
+  name: String!
+  updatedAt: AWSDateTime!
+}

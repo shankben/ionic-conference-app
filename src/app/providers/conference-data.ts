@@ -35,20 +35,6 @@ export class ConferenceData {
     );
   }
 
-  filterSession(
-    session: any,
-    queryWords: string[],
-    excludeTracks: any[],
-    segment: string
-  ) {
-    return this.provider.filterSession(
-      session,
-      queryWords,
-      excludeTracks,
-      segment
-    );
-  }
-
   getSpeakerById(speakerId: string) {
     return this.provider.getSpeakerById(speakerId);
   }

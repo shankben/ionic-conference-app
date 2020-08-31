@@ -5,6 +5,44 @@ import { UserData } from '../user-data';
 
 @Injectable({ providedIn: 'root' })
 export class FirebaseConferenceData {
+
+  private filterSession(
+    session: any,
+    queryWords: string[],
+    excludeTracks: any[],
+    segment: string
+  ) {
+    let matchesQueryText = false;
+    if (queryWords.length) {
+      queryWords.forEach((it: string) => {
+        if (session.name.toLowerCase().indexOf(it) > -1) {
+          matchesQueryText = true;
+        }
+      });
+    } else {
+      matchesQueryText = true;
+    }
+
+    let matchesTracks = false;
+    session.tracks.forEach((trackName: string) => {
+      if (excludeTracks.indexOf(trackName) === -1) {
+        matchesTracks = true;
+      }
+    });
+
+    let matchesSegment = false;
+
+    if (segment === 'favorites') {
+      if (this.user.hasFavorite(session.name)) {
+        matchesSegment = true;
+      }
+    } else {
+      matchesSegment = true;
+    }
+
+    session.hide = !(matchesQueryText && matchesTracks && matchesSegment);
+  }
+
   constructor(
     public user: UserData,
     public firestore: AngularFirestore
@@ -56,43 +94,6 @@ export class FirebaseConferenceData {
         groups: Array.from(groups.values())
       };
     }));
-  }
-
-  filterSession(
-    session: any,
-    queryWords: string[],
-    excludeTracks: any[],
-    segment: string
-  ) {
-    let matchesQueryText = false;
-    if (queryWords.length) {
-      queryWords.forEach((it: string) => {
-        if (session.name.toLowerCase().indexOf(it) > -1) {
-          matchesQueryText = true;
-        }
-      });
-    } else {
-      matchesQueryText = true;
-    }
-
-    let matchesTracks = false;
-    session.tracks.forEach((trackName: string) => {
-      if (excludeTracks.indexOf(trackName) === -1) {
-        matchesTracks = true;
-      }
-    });
-
-    let matchesSegment = false;
-
-    if (segment === 'favorites') {
-      if (this.user.hasFavorite(session.name)) {
-        matchesSegment = true;
-      }
-    } else {
-      matchesSegment = true;
-    }
-
-    session.hide = !(matchesQueryText && matchesTracks && matchesSegment);
   }
 
   getSpeakerById(speakerId: string) {

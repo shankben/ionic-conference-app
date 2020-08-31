@@ -27,13 +27,10 @@ export class ScheduleFilterPage {
     const excludedTrackNames = this.navParams.get('excludedTracks');
 
     this.conferenceData.getTracks().subscribe((tracks: any[]) => {
-      console.log(tracks);
-      tracks.forEach((track) => {
-        this.tracks.push({
-          ...track,
-          isChecked: (excludedTrackNames.indexOf(track.name) === -1)
-        });
-      });
+      tracks.forEach((track) => this.tracks.push({
+        ...track,
+        isChecked: (excludedTrackNames.indexOf(track.name) === -1)
+      }));
     });
   }
 

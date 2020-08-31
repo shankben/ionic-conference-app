@@ -1,0 +1,99 @@
+# this is an auto generated file. This will be overwritten
+query GetLocation($key: String) {
+  getLocation(key: $key) {
+    center
+    lat
+    lng
+    name
+    updatedAt
+  }
+}
+query GetSession($key: String) {
+  getSession(key: $key) {
+    complexList
+    date
+    description
+    document
+    groupId
+    id
+    listOfDocs
+    location
+    name
+    speakerNames
+    timeEnd
+    timeStart
+    tracks
+    updatedAt
+  }
+}
+query GetSpeaker($key: String) {
+  getSpeaker(key: $key) {
+    about
+    email
+    id
+    instagram
+    location
+    name
+    phone
+    profilePic
+    title
+    twitter
+    updatedAt
+  }
+}
+query GetTrack($key: String) {
+  getTrack(key: $key) {
+    icon
+    name
+    updatedAt
+  }
+}
+query ListLocations {
+  listLocations {
+    center
+    lat
+    lng
+    name
+    updatedAt
+  }
+}
+query ListSessions {
+  listSessions {
+    complexList
+    date
+    description
+    document
+    groupId
+    id
+    listOfDocs
+    location
+    name
+    speakerNames
+    timeEnd
+    timeStart
+    tracks
+    updatedAt
+  }
+}
+query ListSpeakers {
+  listSpeakers {
+    about
+    email
+    id
+    instagram
+    location
+    name
+    phone
+    profilePic
+    title
+    twitter
+    updatedAt
+  }
+}
+query ListTracks {
+  listTracks {
+    icon
+    name
+    updatedAt
+  }
+}

@@ -26,13 +26,36 @@ export class AmplifyUserData {
   async user(): Promise<User> {
     const user = await Auth.currentAuthenticatedUser();
     return {
-      username: user.username,
+      username: user.attributes.preferred_username || user.username,
       email: user.attributes.email,
       picture: user.attributes.picture || 'http://www.gravatar.com/avatar'
     };
   }
 
-  async updateUser(userOptions: UserUpdate) { }
+  async updateUser(userOptions: UserUpdate) {
+    const user = await Auth.currentAuthenticatedUser();
+    if (!user) {
+      return;
+    }
+    const { displayName, profilePicture } = userOptions;
+    if (displayName) {
+      await Auth.updateUserAttributes(user, {
+        preferred_username: displayName
+      });
+    }
+    // if (profilePicture) {
+    //   const bucket = firebase.storage().ref();
+    //   try {
+    //     const uid = firebase.auth().currentUser.uid;
+    //     const ref = bucket.child(`/users/${uid}/profilePicture.jpg`);
+    //     await ref.put(profilePicture);
+    //     const photoURL = await ref.getDownloadURL();
+    //     await user.updateProfile({ photoURL });
+    //   } catch (err) {
+    //     console.error(err);
+    //   }
+    // }
+  }
 
   async signIn(userOptions: UserOptions): Promise<any> {
     const { email, password } = userOptions;
@@ -77,9 +100,5 @@ export class AmplifyUserData {
 
   async isSignedIn(): Promise<boolean> {
     return Boolean(await Auth.currentAuthenticatedUser());
-  }
-
-  async checkHasSeenTutorial(): Promise<string> {
-    return '';
   }
 }

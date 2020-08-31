@@ -10,7 +10,7 @@
 <ion-content>
   <div *ngIf="user" class="ion-padding-top ion-text-center">
     <img [src]="user.picture" alt="avatar" />
-    <h2>{{ user.displayName || user.email }}</h2>
+    <h2>{{ user.username || user.email }}</h2>
     <ion-list inset>
       <ion-item button detail="false">
         Change Profile Picture

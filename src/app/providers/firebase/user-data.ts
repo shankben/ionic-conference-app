@@ -14,15 +14,6 @@ export class FirebaseUserData {
   private onAuthStateChanged(user: any) {
     if (user) {
       window.dispatchEvent(new CustomEvent('user:signin'));
-      // console.log({
-      //   displayName: user.displayName,
-      //   email: user.email,
-      //   emailVerified: user.emailVerified,
-      //   `: user.photoURL,
-      //   isAnonymous: user.isAnonymous,
-      //   uid: user.uid,
-      //   providerData: user.providerData
-      // });
     }
   }
 
@@ -33,11 +24,13 @@ export class FirebaseUserData {
 
   async user(): Promise<User> {
     const user = firebase.auth().currentUser;
-    return {
-      username: user.displayName,
-      email: user.email,
-      picture: user.photoURL
-    };
+    if (user) {
+      return {
+        username: user.displayName || user.email,
+        email: user.email,
+        picture: user.photoURL
+      };
+    }
   }
 
   async updateUser(userOptions: UserUpdate) {

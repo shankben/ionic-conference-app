@@ -38,6 +38,7 @@ export class AccountPage {
           text: 'OK',
           handler: ({ username }: any) => this.userData
             .updateUser({ displayName: username })
+            .then(() => this.userData.user().then((user) => this.user = user))
             .catch(console.error)
         }
       ],

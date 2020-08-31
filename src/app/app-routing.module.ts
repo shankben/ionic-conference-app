@@ -27,16 +27,22 @@ const routes: Routes = [
       .SupportModule
   },
   {
-    path: 'login',
+    path: 'signin',
     loadChildren: async () =>
-      (await import('./pages/login/login.module'))
-      .LoginModule
+      (await import('./pages/signin/signin.module'))
+      .SignInModule
   },
   {
     path: 'signup',
     loadChildren: async () =>
       (await import('./pages/signup/signup.module'))
       .SignUpModule
+  },
+  {
+    path: 'confirm-signup',
+    loadChildren: async () =>
+      (await import('./pages/confirm-signup/confirm-signup.module'))
+      .ConfirmSignUpModule
   },
   {
     path: 'tutorial',

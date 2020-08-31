@@ -2,8 +2,8 @@ import { Injectable } from '@angular/core';
 import { Storage } from '@ionic/storage';
 
 import { UserOptions, UserUpdate } from '../interfaces/user-options';
+import { User } from '../interfaces/user';
 import { environment } from '../../environments/environment';
-
 import { AmplifyUserData } from './amplify/user-data';
 import { FirebaseUserData } from './firebase/user-data';
 
@@ -12,15 +12,15 @@ export class UserData {
   private readonly provider: AmplifyUserData | FirebaseUserData;
   private favorites: string[] = [];
 
-  get user(): any {
-    return this.provider.user;
-  }
-
   constructor(public storage: Storage) {
     this.provider = environment.provider === 'firebase' ?
       new FirebaseUserData(storage) :
       new AmplifyUserData(storage);
     console.log(`Using ${environment.provider} provider`);
+  }
+
+  async user(): Promise<User> {
+    return await this.provider.user();
   }
 
   async checkHasSeenTutorial(): Promise<string> {
@@ -31,20 +31,24 @@ export class UserData {
     return this.provider.updateUser(userOptions);
   }
 
-  async login(userOptions: UserOptions): Promise<any> {
-    return this.provider.login(userOptions);
+  async signIn(userOptions: UserOptions): Promise<any> {
+    return this.provider.signIn(userOptions);
   }
 
-  async logout(): Promise<any> {
-    return this.provider.logout();
+  async signOut(): Promise<any> {
+    return this.provider.signOut();
   }
 
   async signup(userOptions: UserOptions): Promise<any> {
     return this.provider.signup(userOptions);
   }
 
-  async isLoggedIn(): Promise<boolean> {
-    return await this.provider.isLoggedIn();
+  async confirmSignup(username: string, code: string): Promise<any> {
+    return this.provider.confirmSignup(username, code);
+  }
+
+  async isSignedIn(): Promise<boolean> {
+    return await this.provider.isSignedIn();
   }
 
   hasFavorite(sessionName: string): boolean {

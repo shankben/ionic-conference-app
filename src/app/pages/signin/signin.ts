@@ -6,12 +6,13 @@ import { UserData } from '../../providers/user-data';
 import { UserOptions } from '../../interfaces/user-options';
 
 @Component({
-  selector: 'page-login',
-  templateUrl: 'login.html',
-  styleUrls: ['./login.scss'],
+  selector: 'page-signin',
+  templateUrl: 'signin.html',
+  styleUrls: ['./signin.scss'],
 })
-export class LoginPage {
-  login: UserOptions = {
+export class SignInPage {
+  userOptions: UserOptions = {
+    username: '',
     email: '',
     password: ''
   };
@@ -22,19 +23,19 @@ export class LoginPage {
     public userData: UserData,
     public router: Router
   ) {
-    window.addEventListener('user:login', () => {
+    window.addEventListener('user:signin', () => {
       this.router.navigateByUrl('/app/tabs/schedule');
     });
   }
 
-  onLogin(form: NgForm) {
+  onSignIn(form: NgForm) {
     this.submitted = true;
     if (form.valid) {
-      this.userData.login(this.login);
+      this.userData.signIn(this.userOptions);
     }
   }
 
-  onSignup() {
+  onSignUp() {
     this.router.navigateByUrl('/signup');
   }
 }

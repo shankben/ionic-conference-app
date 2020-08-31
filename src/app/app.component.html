@@ -20,7 +20,7 @@
           </ion-menu-toggle>
         </ion-list>
 
-        <ion-list *ngIf="loggedIn" lines="none">
+        <ion-list *ngIf="signedIn" lines="none">
           <ion-list-header>Account</ion-list-header>
 
           <ion-menu-toggle autoHide="false">
@@ -30,14 +30,13 @@
               routerDirection="root"
               detail="false">
 
-              <ion-avatar *ngIf="user && user.photoURL; else person">
-                <img [src]="user.photoURL" alt="avatar" />
+              <ion-avatar *ngIf="user && user.picture">
+                <img [src]="user.picture" alt="avatar" />
               </ion-avatar>
 
               <ng-template #person>
                 <ion-icon *ngElse slot="start" name="person"></ion-icon>
               </ng-template>
-
 
               <ion-label>
                 Account
@@ -57,25 +56,25 @@
           </ion-menu-toggle>
 
           <ion-menu-toggle autoHide="false">
-            <ion-item button (click)="logout()" detail="false">
+            <ion-item button (click)="signOut()" detail="false">
               <ion-icon slot="start" name="log-out"></ion-icon>
-              <ion-label>Logout</ion-label>
+              <ion-label>Sign Out</ion-label>
             </ion-item>
           </ion-menu-toggle>
 
         </ion-list>
 
-        <ion-list *ngIf="!loggedIn" lines="none">
+        <ion-list *ngIf="!signedIn" lines="none">
           <ion-list-header>Account</ion-list-header>
 
           <ion-menu-toggle autoHide="false">
             <ion-item
-              routerLink="/login"
+              routerLink="/signin"
               routerLinkActive="active"
               routerDirection="root"
               detail="false">
               <ion-icon slot="start" name="log-in"></ion-icon>
-              <ion-label>Login</ion-label>
+              <ion-label>Sign In</ion-label>
             </ion-item>
           </ion-menu-toggle>
 

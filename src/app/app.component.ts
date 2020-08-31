@@ -7,6 +7,7 @@ import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { Router } from '@angular/router';
 import { SwUpdate } from '@angular/service-worker';
 
+import { User } from './interfaces/User';
 import { UserData } from './providers/user-data';
 
 @Component({
@@ -16,16 +17,12 @@ import { UserData } from './providers/user-data';
   encapsulation: ViewEncapsulation.None
 })
 export class AppComponent implements OnInit {
-  loggedIn = false;
+  signedIn = false;
   dark = false;
-  user: any;
+  user: User;
 
-  async initializeApp() {
-    await this.platform.ready();
-    this.statusBar.styleDefault();
-    this.splashScreen.hide();
-    this.user = this.userData.user;
-    window.addEventListener('user:login', () => this.user = this.userData.user);
+  private updateSignedInStatus(signedIn: boolean) {
+    this.signedIn = signedIn;
   }
 
   constructor(
@@ -42,9 +39,17 @@ export class AppComponent implements OnInit {
     this.initializeApp();
   }
 
+  async initializeApp() {
+    await this.platform.ready();
+    this.statusBar.styleDefault();
+    this.splashScreen.hide();
+    this.user = await this.userData.user();
+    window.addEventListener('user:signin', () =>
+      this.userData.user().then((user) => this.user = user));
+  }
+
   async ngOnInit() {
-    this.checkLoginStatus();
-    this.listenForLoginEvents();
+    this.listenForSignInEvents();
     this.swUpdate.available.subscribe(async () => {
       const toast = await this.toastCtrl.create({
         message: 'Update available!',
@@ -61,28 +66,24 @@ export class AppComponent implements OnInit {
       await this.swUpdate.activateUpdate();
       window.location.reload();
     });
+    await this.checkSignInStatus();
   }
 
-  async checkLoginStatus() {
-    const loggedIn = await this.userData.isLoggedIn();
-    return this.updateLoggedInStatus(loggedIn);
+  async checkSignInStatus() {
+    this.signedIn = await this.userData.isSignedIn();
   }
 
-  updateLoggedInStatus(loggedIn: boolean) {
-    setTimeout(() => this.loggedIn = loggedIn, 300);
-  }
-
-  listenForLoginEvents() {
-    window.addEventListener('user:login', () =>
-      this.updateLoggedInStatus(true));
+  listenForSignInEvents() {
+    window.addEventListener('user:signin', () =>
+      this.updateSignedInStatus(true));
     window.addEventListener('user:signup', () =>
-      this.updateLoggedInStatus(true));
-    window.addEventListener('user:logout', () =>
-      this.updateLoggedInStatus(false));
+      this.updateSignedInStatus(true));
+    window.addEventListener('user:signout', () =>
+      this.updateSignedInStatus(false));
   }
 
-  async logout() {
-    await this.userData.logout();
+  async signOut() {
+    await this.userData.signOut();
     return this.router.navigateByUrl('/app/tabs/schedule');
   }
 

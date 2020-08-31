@@ -4,16 +4,13 @@ import { Storage } from '@ionic/storage';
 import Amplify, { Auth } from 'aws-amplify';
 
 import { UserOptions, UserUpdate } from '../../interfaces/user-options';
+import { User } from '../../interfaces/user';
 
 import { APIService } from './API.service';
 
 
 @Injectable({ providedIn: 'root' })
 export class AmplifyUserData {
-  get user(): any {
-    return Auth.currentAuthenticatedUser();
-  }
-
   constructor(
     public storage: Storage,
     public appSyncService: APIService
@@ -34,29 +31,60 @@ export class AmplifyUserData {
     });
   }
 
-  async updateUser(userOptions: UserUpdate) {
+  async user(): Promise<User> {
+    const user = await Auth.currentAuthenticatedUser();
+    return {
+      username: user.username,
+      email: user.attributes.email,
+      picture: user.attributes.picture || 'http://www.gravatar.com/avatar'
+    };
   }
 
-  async login(userOptions: UserOptions): Promise<any> {
+  async updateUser(userOptions: UserUpdate) { }
+
+  async signIn(userOptions: UserOptions): Promise<any> {
     const { email, password } = userOptions;
     try {
       await Auth.signIn(email, password);
-      return window.dispatchEvent(new CustomEvent('user:login'));
+      return window.dispatchEvent(new CustomEvent('user:signin'));
     } catch (err) {
       console.error(err);
     }
   }
 
-  async logout(): Promise<any> {
-
+  async confirmSignup(username: string, code: string): Promise<any> {
+    try {
+      await Auth.confirmSignUp(username, code);
+    } catch (err) {
+      console.error(err);
+    }
   }
 
   async signup(userOptions: UserOptions): Promise<any> {
-
+    const { username, email, password } = userOptions;
+    try {
+      await Auth.signUp({
+        username,
+        password,
+        attributes: {
+          email
+        }
+      });
+    } catch (err) {
+      console.error(err);
+      throw err;
+    }
   }
 
-  async isLoggedIn(): Promise<boolean> {
-    return false;
+  async signOut(): Promise<any> {
+    if (Auth.currentAuthenticatedUser()) {
+      await Auth.signOut();
+    }
+    window.dispatchEvent(new CustomEvent('user:signout'));
+  }
+
+  async isSignedIn(): Promise<boolean> {
+    return Boolean(await Auth.currentAuthenticatedUser());
   }
 
   async checkHasSeenTutorial(): Promise<string> {

@@ -9,7 +9,7 @@
 
 <ion-content>
   <div *ngIf="user" class="ion-padding-top ion-text-center">
-    <img [src]="user.photoURL" alt="avatar" />
+    <img [src]="user.picture" alt="avatar" />
     <h2>{{ user.displayName || user.email }}</h2>
     <ion-list inset>
       <ion-item button detail="false">
@@ -37,8 +37,8 @@
       <ion-item
         button
         detail="false"
-        (click)="logout()">
-        Logout
+        (click)="signOut()">
+        Sign Out
       </ion-item>
     </ion-list>
   </div>

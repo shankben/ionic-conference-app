@@ -2,18 +2,16 @@ import { Component } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
 import { UserData } from '../../providers/user-data';
-import { UserOptions } from '../../interfaces/user-options';
 
 @Component({
   selector: 'page-signup',
-  templateUrl: 'signup.html',
-  styleUrls: ['./signup.scss'],
+  templateUrl: 'confirm-signup.html',
+  styleUrls: ['./confirm-signup.scss'],
 })
-export class SignupPage {
-  userOptions: UserOptions = {
+export class ConfirmSignupPage {
+  data = {
     username: '',
-    email: '',
-    password: ''
+    code: ''
   };
 
   submitted = false;
@@ -23,12 +21,12 @@ export class SignupPage {
     public userData: UserData
   ) { }
 
-  async onSignup(form: NgForm) {
+  async onConfirmSignup(form: NgForm) {
     this.submitted = true;
     if (form.valid) {
       try {
-        await this.userData.signup(this.userOptions);
-        this.router.navigateByUrl('/confirm-signup');
+        await this.userData.confirmSignup(this.data.username, this.data.code);
+        this.router.navigateByUrl('/app/tabs/schedule');
       } catch (err) {
         // OK
       }

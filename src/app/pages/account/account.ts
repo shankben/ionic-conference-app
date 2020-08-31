@@ -17,8 +17,10 @@ export class AccountPage {
     public router: Router,
     public userData: UserData
   ) {
-    this.user = this.userData.user;
-    window.addEventListener('user:login', () => this.user = this.userData.user);
+    this.userData.user().then((user) => this.user = user);
+    window.addEventListener('user:signin', () => {
+      this.userData.user().then((user) => this.user = user);
+    });
   }
 
   async profilePictureChange(ev: Event) {
@@ -43,7 +45,7 @@ export class AccountPage {
         {
           type: 'text',
           name: 'username',
-          value: this.userData.user.email,
+          value: this.user.email,
           placeholder: 'username'
         }
       ]
@@ -55,8 +57,8 @@ export class AccountPage {
     console.log('Clicked to change password');
   }
 
-  logout() {
-    this.userData.logout();
-    this.router.navigateByUrl('/login');
+  signOut() {
+    this.userData.signOut();
+    this.router.navigateByUrl('/signin');
   }
 }

@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-
 import { Storage } from '@ionic/storage';
 
 import * as firebase from 'firebase/app';
@@ -7,18 +6,19 @@ import 'firebase/auth';
 import 'firebase/storage';
 
 import { UserOptions, UserUpdate } from '../../interfaces/user-options';
+import { User } from '../../interfaces/user';
 import { environment } from '../../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class FirebaseUserData {
   private onAuthStateChanged(user: any) {
     if (user) {
-      window.dispatchEvent(new CustomEvent('user:login'));
+      window.dispatchEvent(new CustomEvent('user:signin'));
       // console.log({
       //   displayName: user.displayName,
       //   email: user.email,
       //   emailVerified: user.emailVerified,
-      //   photoURL: user.photoURL,
+      //   `: user.photoURL,
       //   isAnonymous: user.isAnonymous,
       //   uid: user.uid,
       //   providerData: user.providerData
@@ -26,13 +26,18 @@ export class FirebaseUserData {
     }
   }
 
-  get user(): any {
-    return firebase.auth().currentUser;
-  }
-
   constructor(public storage: Storage) {
     firebase.initializeApp(environment.firebase);
     firebase.auth().onAuthStateChanged(this.onAuthStateChanged);
+  }
+
+  async user(): Promise<User> {
+    const user = firebase.auth().currentUser;
+    return {
+      username: user.displayName,
+      email: user.email,
+      picture: user.photoURL
+    };
   }
 
   async updateUser(userOptions: UserUpdate) {
@@ -58,35 +63,42 @@ export class FirebaseUserData {
     }
   }
 
-  async login(userOptions: UserOptions): Promise<any> {
+  async signIn(userOptions: UserOptions): Promise<any> {
     const { email, password } = userOptions;
     try {
       await firebase.auth().signInWithEmailAndPassword(email, password);
-      return window.dispatchEvent(new CustomEvent('user:login'));
+      return window.dispatchEvent(new CustomEvent('user:signin'));
     } catch (err) {
       console.error(err);
     }
   }
 
-  async logout(): Promise<any> {
+  async signOut(): Promise<any> {
     if (firebase.auth().currentUser) {
       firebase.auth().signOut();
     }
-    window.dispatchEvent(new CustomEvent('user:logout'));
+    window.dispatchEvent(new CustomEvent('user:signout'));
   }
 
   async signup(userOptions: UserOptions): Promise<any> {
-    const { email, password } = userOptions;
+    const { username, email, password } = userOptions;
     try {
       await firebase.auth().createUserWithEmailAndPassword(email, password);
       await firebase.auth().currentUser.sendEmailVerification();
+      await firebase.auth().currentUser.updateProfile({
+        displayName: username
+      });
       return window.dispatchEvent(new CustomEvent('user:signup'));
     } catch (err) {
       console.error(err);
     }
   }
 
-  async isLoggedIn(): Promise<boolean> {
+  async confirmSignup(username: string, code: string): Promise<any> {
+    return;
+  }
+
+  async isSignedIn(): Promise<boolean> {
     return Boolean(firebase.auth().currentUser);
   }
 }

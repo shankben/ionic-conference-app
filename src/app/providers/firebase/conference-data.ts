@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/firestore';
+import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { UserData } from '../user-data';
 
@@ -48,7 +49,7 @@ export class FirebaseConferenceData {
     public firestore: AngularFirestore
   ) { }
 
-  getSessionById(sessionId: string) {
+  getSessionById(sessionId: string): Observable<any> {
     return this.firestore
       .collection('sessions', (ref) => ref.limit(1)
         .where('id', '==', sessionId))
@@ -60,7 +61,7 @@ export class FirebaseConferenceData {
     queryText = '',
     excludeTracks: any[] = [],
     segment = 'all'
-  ) {
+  ): Observable<any> {
     queryText = queryText.toLowerCase().replace(/,|\.|-/g, ' ');
     const queryWords = queryText.split(' ').filter((it) => !!it.trim().length);
     const groups = new Map();
@@ -96,24 +97,24 @@ export class FirebaseConferenceData {
     }));
   }
 
-  getSpeakerById(speakerId: string) {
+  getSpeakerById(speakerId: string): Observable<any> {
     return this.firestore
       .collection('speakers', (ref) => ref.limit(1)
         .where('id', '==', speakerId))
       .valueChanges();
   }
 
-  getSpeakers() {
+  getSpeakers(): Observable<any> {
     return this.firestore
       .collection('speakers', (ref) => ref.orderBy('name'))
       .valueChanges();
   }
 
-  getTracks() {
+  getTracks(): Observable<any> {
     return this.firestore.collection('tracks').valueChanges();
   }
 
-  getLocations() {
+  getLocations(): Observable<any> {
     return this.firestore.collection('locations').valueChanges();
   }
 }

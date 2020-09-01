@@ -12,15 +12,17 @@ import { UserData } from '../../providers/user-data';
 export class AccountPage {
   user: any;
 
+  private setUser() {
+    this.userData.user().then((user) => this.user = user);
+  }
+
   constructor(
     public alertCtrl: AlertController,
     public router: Router,
     public userData: UserData
   ) {
-    this.userData.user().then((user) => this.user = user);
-    window.addEventListener('user:signin', () => {
-      this.userData.user().then((user) => this.user = user);
-    });
+    this.setUser();
+    window.addEventListener('user:signin', () => this.setUser());
   }
 
   async profilePictureChange(ev: Event) {

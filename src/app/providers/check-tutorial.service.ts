@@ -5,7 +5,7 @@ import { Storage } from '@ionic/storage';
   providedIn: 'root'
 })
 export class CheckTutorial implements CanLoad {
-  constructor(private storage: Storage, private router: Router) { }
+  constructor(private storage: Storage, private router: Router) {}
 
   async canLoad() {
     const res = await this.storage.get('ion_did_tutorial');

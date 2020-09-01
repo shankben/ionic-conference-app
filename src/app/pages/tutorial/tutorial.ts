@@ -23,7 +23,7 @@ export class TutorialPage {
 
   async startApp() {
     await this.router.navigateByUrl('/app/tabs/schedule', { replaceUrl: true });
-    this.storage.set('ion_did_tutorial', true);
+    await this.storage.set('ion_did_tutorial', true);
   }
 
   async onSlideChangeStart(event: any) {
@@ -39,7 +39,6 @@ export class TutorialPage {
   }
 
   ionViewDidLeave() {
-    // enable the root left menu when leaving the tutorial page
     this.menu.enable(true);
   }
 }

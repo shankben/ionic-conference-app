@@ -27,7 +27,7 @@ export class ConferenceData {
     queryText = '',
     excludeTracks: any[] = [],
     segment = 'all'
-  ) {
+  ): Observable<any> {
     return this.provider.getSessions(
       dayIndex,
       queryText,
@@ -40,15 +40,15 @@ export class ConferenceData {
     return this.provider.getSpeakerById(speakerId);
   }
 
-  getSpeakers() {
+  getSpeakers(): Observable<any> {
     return this.provider.getSpeakers();
   }
 
-  getTracks() {
+  getTracks(): Observable<any> {
     return this.provider.getTracks();
   }
 
-  getLocations() {
+  getLocations(): Observable<any> {
     return this.provider.getLocations();
   }
 }

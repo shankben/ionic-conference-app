@@ -2,6 +2,7 @@ import apiKey from '../../secrets/google-api-key';
 
 export const environment = {
   production: true,
+  provider: 'firebase',
   firebase: {
     apiKey,
     authDomain: 'ionic-conference-demo.firebaseapp.com',

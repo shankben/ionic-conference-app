@@ -25,6 +25,15 @@ export class AppComponent implements OnInit {
     this.signedIn = signedIn;
   }
 
+  private listenForSignInEvents() {
+    window.addEventListener('user:signin', () =>
+      this.updateSignedInStatus(true));
+    window.addEventListener('user:signup', () =>
+      this.updateSignedInStatus(true));
+    window.addEventListener('user:signout', () =>
+      this.updateSignedInStatus(false));
+  }
+
   constructor(
     private menu: MenuController,
     private platform: Platform,
@@ -54,12 +63,7 @@ export class AppComponent implements OnInit {
       const toast = await this.toastCtrl.create({
         message: 'Update available!',
         position: 'bottom',
-        buttons: [
-          {
-            role: 'cancel',
-            text: 'Reload'
-          }
-        ]
+        buttons: [ { role: 'cancel', text: 'Reload' } ]
       });
       await toast.present();
       await toast.onDidDismiss();
@@ -71,15 +75,6 @@ export class AppComponent implements OnInit {
 
   async checkSignInStatus() {
     this.signedIn = await this.userData.isSignedIn();
-  }
-
-  listenForSignInEvents() {
-    window.addEventListener('user:signin', () =>
-      this.updateSignedInStatus(true));
-    window.addEventListener('user:signup', () =>
-      this.updateSignedInStatus(true));
-    window.addEventListener('user:signout', () =>
-      this.updateSignedInStatus(false));
   }
 
   async signOut() {

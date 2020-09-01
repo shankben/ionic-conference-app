@@ -62,10 +62,7 @@ export class AmplifyConferenceData {
     queryText = '',
     excludeTracks: any[] = [],
     segment = 'all'
-  ): Observable<{
-    shownSessions: number,
-    groups: any[]
-  }> {
+  ): Observable<any> {
     queryText = queryText.toLowerCase().replace(/,|\.|-/g, ' ');
     const queryWords = queryText.split(' ').filter((it) => !!it.trim().length);
     const groups = new Map();
@@ -103,19 +100,19 @@ export class AmplifyConferenceData {
     }));
   }
 
-  getSpeakerById(speakerId: string) {
+  getSpeakerById(speakerId: string): Observable<any> {
     return of(...[{}]);
   }
 
-  getSpeakers() {
+  getSpeakers(): Observable<any> {
     return from(this.appSyncService.ListSpeakers());
   }
 
-  getTracks() {
+  getTracks(): Observable<any> {
     return from(this.appSyncService.ListTracks());
   }
 
-  getLocations() {
+  getLocations(): Observable<any> {
     return from(this.appSyncService.ListLocations());
   }
 }

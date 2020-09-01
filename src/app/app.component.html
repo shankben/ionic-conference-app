@@ -3,9 +3,7 @@
     <ion-menu contentId="main-content">
       <ion-content>
         <ion-list lines="none">
-          <ion-list-header>
-            Conference
-          </ion-list-header>
+          <ion-list-header>Conference</ion-list-header>
           <ion-menu-toggle
             autoHide="false"
             *ngFor="let p of appPages; let i = index">
@@ -16,6 +14,17 @@
               detail="false">
               <ion-icon slot="start" [name]="p.icon + '-outline'"></ion-icon>
               <ion-label>{{ p.title }}</ion-label>
+            </ion-item>
+          </ion-menu-toggle>
+
+          <ion-menu-toggle autoHide="false">
+            <ion-item
+              routerLink="/app/tabs/schedule"
+              routerLinkActive="active"
+              routerDirection="root"
+              detail="false">
+              <ion-icon slot="start" name="calendar"></ion-icon>
+              <ion-label>Schedule</ion-label>
             </ion-item>
           </ion-menu-toggle>
         </ion-list>
@@ -38,9 +47,7 @@
                 <ion-icon *ngElse slot="start" name="person"></ion-icon>
               </ng-template>
 
-              <ion-label>
-                Account
-              </ion-label>
+              <ion-label>Account</ion-label>
             </ion-item>
           </ion-menu-toggle>
 
@@ -61,7 +68,6 @@
               <ion-label>Sign Out</ion-label>
             </ion-item>
           </ion-menu-toggle>
-
         </ion-list>
 
         <ion-list *ngIf="!signedIn" lines="none">

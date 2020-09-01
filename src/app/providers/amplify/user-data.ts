@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Storage as IonicStorage } from '@ionic/storage';
 import Amplify, { Auth, Storage } from 'aws-amplify';
 import { CognitoUser } from '@aws-amplify/auth';
+
 import { UserOptions, UserUpdate } from '../../interfaces/user-options';
 import { User } from '../../interfaces/user';
 
@@ -30,13 +31,30 @@ export class AmplifyUserData {
     });
   }
 
+  private async blobToDataUrl(blob: Blob): Promise<string> {
+    return new Promise((resolve) => {
+      const fr = new FileReader();
+      fr.onload = (e) => resolve(e.target.result as string);
+      fr.readAsDataURL(blob);
+    });
+  }
+
   async user(): Promise<User> {
     const user = await Auth.currentAuthenticatedUser();
-    const photoURL = await Storage.get(user.attributes.picture) as string;
+    let pictureUrl: string;
+
+    try {
+      const { picture } = user.attributes;
+      const res = await Storage.get(picture, { download: true }) as any;
+      pictureUrl = await this.blobToDataUrl(res.Body);
+    } catch (err) {
+      pictureUrl = 'http://www.gravatar.com/avatar';
+    }
+
     return {
       username: user.attributes.preferred_username || user.username,
       email: user.attributes.email,
-      picture: photoURL || 'http://www.gravatar.com/avatar'
+      picture: pictureUrl
     };
   }
 

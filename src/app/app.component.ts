@@ -9,6 +9,7 @@ import { SwUpdate } from '@angular/service-worker';
 
 import { User } from './interfaces/user';
 import { UserData } from './providers/user-data';
+import { environment } from '../environments/environment';
 
 @Component({
   selector: 'app-root',
@@ -18,7 +19,9 @@ import { UserData } from './providers/user-data';
 })
 export class AppComponent implements OnInit {
   signedIn = false;
-  dark = false;
+
+  dark = environment.provider === 'firebase';
+
   user: User;
 
   private updateSignedInStatus(signedIn: boolean) {

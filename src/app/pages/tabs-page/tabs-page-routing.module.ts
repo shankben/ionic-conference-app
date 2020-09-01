@@ -68,6 +68,11 @@ const routes: Routes = [
         ]
       },
       {
+        path: 'account',
+        redirectTo: '/account',
+        pathMatch: 'full'
+      },
+      {
         path: '',
         redirectTo: '/app/tabs/schedule',
         pathMatch: 'full'

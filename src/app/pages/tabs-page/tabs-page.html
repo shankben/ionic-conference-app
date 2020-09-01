@@ -19,5 +19,14 @@
       <ion-icon name="information-circle"></ion-icon>
       <ion-label>About</ion-label>
     </ion-tab-button>
+
+    <ion-tab-button
+      tab="account"
+      *ngIf="signedIn && user && user.picture; else anonymous">
+      <ion-avatar class="avatar">
+        <img [src]="user.picture" alt="avatar" />
+      </ion-avatar>
+      <ion-label>Account</ion-label>
+    </ion-tab-button>
   </ion-tab-bar>
 </ion-tabs>

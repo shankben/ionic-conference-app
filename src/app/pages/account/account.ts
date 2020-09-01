@@ -3,7 +3,6 @@ import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { UserData } from '../../providers/user-data';
 
-
 @Component({
   selector: 'page-account',
   templateUrl: 'account.html',

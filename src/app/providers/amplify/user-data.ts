@@ -40,17 +40,18 @@ export class AmplifyUserData {
   }
 
   async user(): Promise<User> {
-    const user = await Auth.currentAuthenticatedUser();
     let pictureUrl: string;
-
+    const user = await Auth.currentAuthenticatedUser();
     try {
+      if (!user.attributes.picture) {
+        throw new Error();
+      }
       const { picture } = user.attributes;
       const res = await Storage.get(picture, { download: true }) as any;
       pictureUrl = await this.blobToDataUrl(res.Body);
     } catch (err) {
       pictureUrl = 'http://www.gravatar.com/avatar';
     }
-
     return {
       username: user.attributes.preferred_username || user.username,
       email: user.attributes.email,

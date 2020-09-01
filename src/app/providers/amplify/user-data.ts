@@ -1,12 +1,13 @@
 import { Injectable } from '@angular/core';
-import { Storage } from '@ionic/storage';
-import Amplify, { Auth } from 'aws-amplify';
+import { Storage as IonicStorage } from '@ionic/storage';
+import Amplify, { Auth, Storage } from 'aws-amplify';
+import { CognitoUser } from '@aws-amplify/auth';
 import { UserOptions, UserUpdate } from '../../interfaces/user-options';
 import { User } from '../../interfaces/user';
 
 @Injectable({ providedIn: 'root' })
 export class AmplifyUserData {
-  constructor(public storage: Storage) {
+  constructor(public storage: IonicStorage) {
     Amplify.configure({
       aws_appsync_graphqlEndpoint: 'https://v5x3hir3ujcjjmh2leisksak2e.appsync-api.us-east-1.amazonaws.com/graphql',
       aws_appsync_region: 'us-east-1',
@@ -19,21 +20,30 @@ export class AmplifyUserData {
         userPoolId: 'us-east-1_EtmbYJhyA',
         userPoolWebClientId: '52nl2q4lc126hgqfiekb67vh8d',
         authenticationFlowType: 'USER_PASSWORD_AUTH'
+      },
+      Storage: {
+        AWSS3: {
+          bucket: 'ionic-conference-demo',
+          region: 'us-east-1'
+        }
       }
     });
   }
 
   async user(): Promise<User> {
     const user = await Auth.currentAuthenticatedUser();
+    const photoURL = await Storage.get(user.attributes.picture) as string;
     return {
       username: user.attributes.preferred_username || user.username,
       email: user.attributes.email,
-      picture: user.attributes.picture || 'http://www.gravatar.com/avatar'
+      picture: photoURL || 'http://www.gravatar.com/avatar'
     };
   }
 
   async updateUser(userOptions: UserUpdate) {
-    const user = await Auth.currentAuthenticatedUser();
+    const user: CognitoUser = await Auth.currentAuthenticatedUser();
+    const attributes = await Auth.userAttributes(user);
+    const sub = attributes.find((it: any) => it.Name === 'sub').getValue();
     if (!user) {
       return;
     }
@@ -43,18 +53,18 @@ export class AmplifyUserData {
         preferred_username: displayName
       });
     }
-    // if (profilePicture) {
-    //   const bucket = firebase.storage().ref();
-    //   try {
-    //     const uid = firebase.auth().currentUser.uid;
-    //     const ref = bucket.child(`/users/${uid}/profilePicture.jpg`);
-    //     await ref.put(profilePicture);
-    //     const photoURL = await ref.getDownloadURL();
-    //     await user.updateProfile({ photoURL });
-    //   } catch (err) {
-    //     console.error(err);
-    //   }
-    // }
+    if (profilePicture) {
+      try {
+        await Storage.put(`${sub}.jpg`, profilePicture, {
+          contentType: 'image/jpeg'
+        });
+        await Auth.updateUserAttributes(user, {
+          picture: `${sub}.jpg`
+        });
+      } catch (err) {
+        console.error(err);
+      }
+    }
   }
 
   async signIn(userOptions: UserOptions): Promise<any> {

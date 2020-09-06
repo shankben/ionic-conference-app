@@ -10,10 +10,10 @@ import { User } from '../../interfaces/user';
 export class AmplifyUserData {
   constructor(public storage: IonicStorage) {
     Amplify.configure({
-      aws_appsync_graphqlEndpoint: 'https://v5x3hir3ujcjjmh2leisksak2e.appsync-api.us-east-1.amazonaws.com/graphql',
+      aws_appsync_graphqlEndpoint: 'https://ssf2omfthfdtbmlgzk2lhvz3cm.appsync-api.us-east-1.amazonaws.com/graphql',
       aws_appsync_region: 'us-east-1',
       aws_appsync_authenticationType: 'API_KEY',
-      aws_appsync_apiKey: 'da2-7ozmt6j2rbeixjs3jn2zb424wm',
+      aws_appsync_apiKey: 'da2-zs5ah5jluvaodelswx262w5624',
       Auth: {
         region: 'us-east-1',
         identityPoolRegion: 'us-east-1',

@@ -1,15 +1,7 @@
-import apiKey from '../../secrets/google-api-key';
+import firebaseAppConfig from '../../secrets/firebase-app-config';
 
 export const environment = {
   production: false,
   provider: 'amplify',
-  firebase: {
-    apiKey,
-    authDomain: 'ionic-conference-demo.firebaseapp.com',
-    databaseURL: 'https://ionic-conference-demo.firebaseio.com',
-    projectId: 'ionic-conference-demo',
-    storageBucket: 'ionic-conference-demo.appspot.com',
-    messagingSenderId: '953187498755',
-    appId: '1:953187498755:web:e58f2602c8b30ec152c736'
-  }
+  firebase: firebaseAppConfig
 };

@@ -13,7 +13,7 @@ import { DOCUMENT} from '@angular/common';
 import { ConferenceData } from '../../providers/conference-data';
 import darkStyle from './map-dark-style';
 
-import googleApiKey from '../../../../secrets/google-api-key';
+import firebaseAppConfig from '../../../../secrets/firebase-app-config';
 
 @Component({
   selector: 'page-map',
@@ -37,7 +37,7 @@ export class MapPage implements AfterViewInit {
     }
     const script = document.createElement('script');
     script.src = 'https://maps.googleapis.com/maps/api/js?' +
-      `key=${googleApiKey}&libraries=&v=weekly`;
+      `key=${firebaseAppConfig.apiKey}&libraries=&v=weekly`;
     script.async = true;
     script.defer = true;
     document.body.appendChild(script);

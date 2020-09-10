@@ -1,4 +1,14 @@
 # this is an auto generated file. This will be overwritten
+query GetComplexity($key: String) {
+  getComplexity(key: $key) {
+    family_D_genus_D_name
+    family_D_genus_D_species_D_commonName
+    family_D_genus_D_species_D_name
+    family_D_name
+    number
+    updatedAt
+  }
+}
 query GetLocation($key: String) {
   getLocation(key: $key) {
     center
@@ -10,19 +20,17 @@ query GetLocation($key: String) {
 }
 query GetSession($key: String) {
   getSession(key: $key) {
-    complexList
     date
     description
-    document
     groupId
     id
-    listOfDocs
     location
     name
-    speakerNames
+    speakerNames_D_0
+    speakerNames_D_1
     timeEnd
     timeStart
-    tracks
+    tracks_D_0
     updatedAt
   }
 }
@@ -48,6 +56,16 @@ query GetTrack($key: String) {
     updatedAt
   }
 }
+query ListComplexities {
+  listComplexities {
+    family_D_genus_D_name
+    family_D_genus_D_species_D_commonName
+    family_D_genus_D_species_D_name
+    family_D_name
+    number
+    updatedAt
+  }
+}
 query ListLocations {
   listLocations {
     center
@@ -59,19 +77,17 @@ query ListLocations {
 }
 query ListSessions {
   listSessions {
-    complexList
     date
     description
-    document
     groupId
     id
-    listOfDocs
     location
     name
-    speakerNames
+    speakerNames_D_0
+    speakerNames_D_1
     timeEnd
     timeStart
-    tracks
+    tracks_D_0
     updatedAt
   }
 }

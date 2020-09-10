@@ -2,6 +2,15 @@
   query: Query
 }
 
+type Complexity {
+  family_D_genus_D_name: String!
+  family_D_genus_D_species_D_commonName: String!
+  family_D_genus_D_species_D_name: String!
+  family_D_name: String!
+  number: Int!
+  updatedAt: AWSDateTime!
+}
+
 type Location {
   center: Boolean
   lat: Float!
@@ -11,10 +20,12 @@ type Location {
 }
 
 type Query {
+  getComplexity(key: String): Complexity
   getLocation(key: String): Location
   getSession(key: String): Session
   getSpeaker(key: String): Speaker
   getTrack(key: String): Track
+  listComplexities: [Complexity]
   listLocations: [Location]
   listSessions: [Session]
   listSpeakers: [Speaker]
@@ -22,19 +33,17 @@ type Query {
 }
 
 type Session {
-  complexList: AWSJSON
   date: String!
   description: String
-  document: AWSJSON
   groupId: String!
   id: String!
-  listOfDocs: AWSJSON
   location: String!
   name: String!
-  speakerNames: [String!]
+  speakerNames_D_0: String
+  speakerNames_D_1: String
   timeEnd: String!
   timeStart: String!
-  tracks: [String!]!
+  tracks_D_0: String!
   updatedAt: AWSDateTime!
 }
 

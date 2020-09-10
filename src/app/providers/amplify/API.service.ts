@@ -6,6 +6,16 @@ import API, { graphqlOperation } from "@aws-amplify/api";
 import { GraphQLResult } from "@aws-amplify/api/lib/types";
 import { Observable } from "zen-observable-ts";
 
+export type GetComplexityQuery = {
+  __typename: "Complexity";
+  family_D_genus_D_name: string;
+  family_D_genus_D_species_D_commonName: string;
+  family_D_genus_D_species_D_name: string;
+  family_D_name: string;
+  number: number;
+  updatedAt: string;
+};
+
 export type GetLocationQuery = {
   __typename: "Location";
   center: boolean | null;
@@ -17,19 +27,17 @@ export type GetLocationQuery = {
 
 export type GetSessionQuery = {
   __typename: "Session";
-  complexList: string | null;
   date: string;
   description: string | null;
-  document: string | null;
   groupId: string;
   id: string;
-  listOfDocs: string | null;
   location: string;
   name: string;
-  speakerNames: Array<string> | null;
+  speakerNames_D_0: string | null;
+  speakerNames_D_1: string | null;
   timeEnd: string;
   timeStart: string;
-  tracks: Array<string>;
+  tracks_D_0: string;
   updatedAt: string;
 };
 
@@ -55,6 +63,16 @@ export type GetTrackQuery = {
   updatedAt: string;
 };
 
+export type ListComplexitiesQuery = {
+  __typename: "Complexity";
+  family_D_genus_D_name: string;
+  family_D_genus_D_species_D_commonName: string;
+  family_D_genus_D_species_D_name: string;
+  family_D_name: string;
+  number: number;
+  updatedAt: string;
+};
+
 export type ListLocationsQuery = {
   __typename: "Location";
   center: boolean | null;
@@ -66,19 +84,17 @@ export type ListLocationsQuery = {
 
 export type ListSessionsQuery = {
   __typename: "Session";
-  complexList: string | null;
   date: string;
   description: string | null;
-  document: string | null;
   groupId: string;
   id: string;
-  listOfDocs: string | null;
   location: string;
   name: string;
-  speakerNames: Array<string> | null;
+  speakerNames_D_0: string | null;
+  speakerNames_D_1: string | null;
   timeEnd: string;
   timeStart: string;
-  tracks: Array<string>;
+  tracks_D_0: string;
   updatedAt: string;
 };
 
@@ -108,6 +124,27 @@ export type ListTracksQuery = {
   providedIn: "root"
 })
 export class APIService {
+  async GetComplexity(key?: string): Promise<GetComplexityQuery> {
+    const statement = `query GetComplexity($key: String) {
+        getComplexity(key: $key) {
+          __typename
+          family_D_genus_D_name
+          family_D_genus_D_species_D_commonName
+          family_D_genus_D_species_D_name
+          family_D_name
+          number
+          updatedAt
+        }
+      }`;
+    const gqlAPIServiceArguments: any = {};
+    if (key) {
+      gqlAPIServiceArguments.key = key;
+    }
+    const response = (await API.graphql(
+      graphqlOperation(statement, gqlAPIServiceArguments)
+    )) as any;
+    return <GetComplexityQuery>response.data.getComplexity;
+  }
   async GetLocation(key?: string): Promise<GetLocationQuery> {
     const statement = `query GetLocation($key: String) {
         getLocation(key: $key) {
@@ -132,19 +169,17 @@ export class APIService {
     const statement = `query GetSession($key: String) {
         getSession(key: $key) {
           __typename
-          complexList
           date
           description
-          document
           groupId
           id
-          listOfDocs
           location
           name
-          speakerNames
+          speakerNames_D_0
+          speakerNames_D_1
           timeEnd
           timeStart
-          tracks
+          tracks_D_0
           updatedAt
         }
       }`;
@@ -201,6 +236,21 @@ export class APIService {
     )) as any;
     return <GetTrackQuery>response.data.getTrack;
   }
+  async ListComplexities(): Promise<Array<ListComplexitiesQuery>> {
+    const statement = `query ListComplexities {
+        listComplexities {
+          __typename
+          family_D_genus_D_name
+          family_D_genus_D_species_D_commonName
+          family_D_genus_D_species_D_name
+          family_D_name
+          number
+          updatedAt
+        }
+      }`;
+    const response = (await API.graphql(graphqlOperation(statement))) as any;
+    return <Array<ListComplexitiesQuery>>response.data.listComplexities;
+  }
   async ListLocations(): Promise<Array<ListLocationsQuery>> {
     const statement = `query ListLocations {
         listLocations {
@@ -219,19 +269,17 @@ export class APIService {
     const statement = `query ListSessions {
         listSessions {
           __typename
-          complexList
           date
           description
-          document
           groupId
           id
-          listOfDocs
           location
           name
-          speakerNames
+          speakerNames_D_0
+          speakerNames_D_1
           timeEnd
           timeStart
-          tracks
+          tracks_D_0
           updatedAt
         }
       }`;

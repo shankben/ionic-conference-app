@@ -3,20 +3,26 @@ import { Storage } from '@ionic/storage';
 
 import { UserOptions, UserUpdate } from '../interfaces/user-options';
 import { User } from '../interfaces/user';
-import { environment } from '../../environments/environment';
 import { AmplifyUserData } from './amplify/user-data';
 import { FirebaseUserData } from './firebase/user-data';
 
 @Injectable({ providedIn: 'root' })
 export class UserData {
-  private readonly provider: AmplifyUserData | FirebaseUserData;
+  private firebaseProvider: FirebaseUserData;
+  private amplifyProvider: AmplifyUserData;
+  private provider: AmplifyUserData | FirebaseUserData;
   private favorites: string[] = [];
 
   constructor(public storage: Storage) {
-    this.provider = environment.provider === 'firebase' ?
-      new FirebaseUserData(storage) :
-      new AmplifyUserData(storage);
-    console.log(`Using ${environment.provider} provider`);
+    this.firebaseProvider = new FirebaseUserData(storage);
+    this.amplifyProvider = new AmplifyUserData(storage);
+    this.provider = this.amplifyProvider;
+    window.addEventListener(
+      'themeChanged',
+      (ev: CustomEvent) => this.provider = ev.detail.isDark ?
+        this.firebaseProvider :
+        this.amplifyProvider
+    );
   }
 
   async user(): Promise<User> {

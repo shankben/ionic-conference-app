@@ -1,21 +1,25 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { environment } from '../../environments/environment';
 import { AmplifyConferenceData } from './amplify/conference-data';
 import { FirebaseConferenceData } from './firebase/conference-data';
 
 @Injectable({ providedIn: 'root' })
 export class ConferenceData {
-  private readonly provider: AmplifyConferenceData | FirebaseConferenceData;
+  private provider: AmplifyConferenceData | FirebaseConferenceData;
+
   data: any;
 
   constructor(
     amplifyProvider: AmplifyConferenceData,
     firebaseProvider: FirebaseConferenceData
   ) {
-    this.provider = environment.provider === 'firebase' ?
-      firebaseProvider :
-      amplifyProvider;
+    this.provider = amplifyProvider;
+    window.addEventListener(
+      'themeChanged',
+      (ev: CustomEvent) => this.provider = ev.detail.isDark ?
+        firebaseProvider :
+        amplifyProvider
+    );
   }
 
   getSessionById(sessionId: string): Observable<any> {

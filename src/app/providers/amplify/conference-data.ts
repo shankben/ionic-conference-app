@@ -29,7 +29,7 @@ export class AmplifyConferenceData {
     }
 
     let matchesTracks = false;
-    session.tracks.forEach((trackName: string) => {
+    (session as any).tracks.forEach((trackName: string) => {
       if (excludeTracks.indexOf(trackName) === -1) {
         matchesTracks = true;
       }
@@ -66,7 +66,6 @@ export class AmplifyConferenceData {
     queryText = queryText.toLowerCase().replace(/,|\.|-/g, ' ');
     const queryWords = queryText.split(' ').filter((it) => !!it.trim().length);
     const groups = new Map();
-
     return from(this.appSyncService.ListSessions()).pipe(map((docs) => {
       let shownSessions = 0;
       docs

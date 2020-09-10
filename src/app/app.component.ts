@@ -3,7 +3,14 @@ import { SplashScreen } from '@ionic-native/splash-screen/ngx';
 import { StatusBar } from '@ionic-native/status-bar/ngx';
 import { Storage } from '@ionic/storage';
 
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  Inject,
+  AfterViewInit,
+  ViewEncapsulation
+} from '@angular/core';
+import { DOCUMENT} from '@angular/common';
 import { Router } from '@angular/router';
 import { SwUpdate } from '@angular/service-worker';
 
@@ -17,7 +24,7 @@ import { environment } from '../environments/environment';
   styleUrls: ['./app.component.scss'],
   encapsulation: ViewEncapsulation.None
 })
-export class AppComponent implements OnInit {
+export class AppComponent implements OnInit, AfterViewInit {
   signedIn = false;
 
   dark = environment.provider === 'firebase';
@@ -38,6 +45,7 @@ export class AppComponent implements OnInit {
   }
 
   constructor(
+    @Inject(DOCUMENT) private doc: Document,
     private menu: MenuController,
     private platform: Platform,
     private router: Router,
@@ -53,6 +61,7 @@ export class AppComponent implements OnInit {
 
   private async initializeApp() {
     await this.platform.ready();
+    await this.storage.set('isDarkTheme', this.dark);
     this.statusBar.styleDefault();
     this.splashScreen.hide();
     this.user = await this.userData.user();
@@ -74,6 +83,25 @@ export class AppComponent implements OnInit {
       window.location.reload();
     });
     await this.checkSignInStatus();
+  }
+
+  async ngAfterViewInit() {
+    const appEl = this.doc.querySelector('ion-app');
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.attributeName === 'class') {
+          const el = mutation.target as HTMLElement;
+          const isDark = el.classList.contains('dark-theme');
+          window.dispatchEvent(new CustomEvent('themeChanged', {
+            detail: { isDark }
+          }));
+        }
+      });
+    });
+
+    observer.observe(appEl, {
+      attributes: true
+    });
   }
 
   async checkSignInStatus() {

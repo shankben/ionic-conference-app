@@ -6,6 +6,8 @@ import { CognitoUser } from '@aws-amplify/auth';
 import { UserOptions, UserUpdate } from '../../interfaces/user-options';
 import { User } from '../../interfaces/user';
 
+import { environment } from '../../../environments/environment';
+
 @Injectable({ providedIn: 'root' })
 export class AmplifyUserData {
   constructor(public storage: IonicStorage) {

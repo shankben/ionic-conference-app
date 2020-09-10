@@ -11,26 +11,7 @@ import { environment } from '../../../environments/environment';
 @Injectable({ providedIn: 'root' })
 export class AmplifyUserData {
   constructor(public storage: IonicStorage) {
-    Amplify.configure({
-      aws_appsync_graphqlEndpoint: 'https://ssf2omfthfdtbmlgzk2lhvz3cm.appsync-api.us-east-1.amazonaws.com/graphql',
-      aws_appsync_region: 'us-east-1',
-      aws_appsync_authenticationType: 'API_KEY',
-      aws_appsync_apiKey: 'da2-zs5ah5jluvaodelswx262w5624',
-      Auth: {
-        region: 'us-east-1',
-        identityPoolRegion: 'us-east-1',
-        identityPoolId: 'us-east-1:94a40cc3-ddaa-48ab-8ac9-5f60681dd605',
-        userPoolId: 'us-east-1_EtmbYJhyA',
-        userPoolWebClientId: '52nl2q4lc126hgqfiekb67vh8d',
-        authenticationFlowType: 'USER_PASSWORD_AUTH'
-      },
-      Storage: {
-        AWSS3: {
-          bucket: 'ionic-conference-demo',
-          region: 'us-east-1'
-        }
-      }
-    });
+    Amplify.configure(environment.amplify);
   }
 
   private async blobToDataUrl(blob: Blob): Promise<string> {

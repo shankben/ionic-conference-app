@@ -11,9 +11,10 @@
   <div *ngIf="user" class="ion-padding-top ion-text-center">
     <img [src]="user.picture" alt="avatar" />
     <h2>{{ user.username || user.email }}</h2>
+
     <ion-list inset>
       <ion-item button detail="false">
-        Change Profile Picture
+        <ion-label>Change Profile Picture</ion-label>
         <ion-input
           id="fileInput"
           type="file"
@@ -22,23 +23,29 @@
           (change)="profilePictureChange($event)">
         </ion-input>
       </ion-item>
+
       <ion-item
         button
         detail="false"
         (click)="changeUsername()">
-        Change Username
+        <ion-label>Change Username</ion-label>
+        <ion-input type="hidden"></ion-input>
       </ion-item>
+
       <ion-item
         button
         detail="false"
         (click)="changePassword()">
-        Change Password
+        <ion-label>Change Password</ion-label>
+        <ion-input type="hidden"></ion-input>
       </ion-item>
+
       <ion-item
         button
         detail="false"
         (click)="signOut()">
-        Sign Out
+        <ion-label>Sign Out</ion-label>
+        <ion-input type="hidden"></ion-input>
       </ion-item>
     </ion-list>
   </div>

@@ -1,4 +1,4 @@
-﻿schema {
+schema {
   query: Query
 }
 
@@ -7,12 +7,14 @@ type Complexity {
   family_D_genus_D_species_D_commonName: String!
   family_D_genus_D_species_D_name: String!
   family_D_name: String!
+  key: ID!
   number: Int!
   updatedAt: AWSDateTime!
 }
 
 type Location {
   center: Boolean
+  key: ID!
   lat: Float!
   lng: Float!
   name: String!
@@ -37,13 +39,13 @@ type Session {
   description: String
   groupId: String!
   id: String!
+  key: ID!
   location: String!
   name: String!
-  speakerNames_D_0: String
-  speakerNames_D_1: String
+  speakerNames: [String!]
   timeEnd: String!
   timeStart: String!
-  tracks_D_0: String!
+  tracks: [String!]!
   updatedAt: AWSDateTime!
 }
 
@@ -52,6 +54,7 @@ type Speaker {
   email: String!
   id: String!
   instagram: String!
+  key: ID!
   location: String!
   name: String!
   phone: String!
@@ -63,6 +66,7 @@ type Speaker {
 
 type Track {
   icon: String!
+  key: ID!
   name: String!
   updatedAt: AWSDateTime!
 }

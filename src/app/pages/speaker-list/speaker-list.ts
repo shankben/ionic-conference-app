@@ -13,6 +13,7 @@ export class SpeakerListPage {
 
   ionViewDidEnter() {
     this.conferenceData.getSpeakers().subscribe((speakers: any[]) => {
+      console.log(speakers);
       this.speakers = speakers;
     });
   }

@@ -5,6 +5,7 @@ query GetComplexity($key: String) {
     family_D_genus_D_species_D_commonName
     family_D_genus_D_species_D_name
     family_D_name
+    key
     number
     updatedAt
   }
@@ -12,6 +13,7 @@ query GetComplexity($key: String) {
 query GetLocation($key: String) {
   getLocation(key: $key) {
     center
+    key
     lat
     lng
     name
@@ -24,13 +26,13 @@ query GetSession($key: String) {
     description
     groupId
     id
+    key
     location
     name
-    speakerNames_D_0
-    speakerNames_D_1
+    speakerNames
     timeEnd
     timeStart
-    tracks_D_0
+    tracks
     updatedAt
   }
 }
@@ -40,6 +42,7 @@ query GetSpeaker($key: String) {
     email
     id
     instagram
+    key
     location
     name
     phone
@@ -52,6 +55,7 @@ query GetSpeaker($key: String) {
 query GetTrack($key: String) {
   getTrack(key: $key) {
     icon
+    key
     name
     updatedAt
   }
@@ -62,6 +66,7 @@ query ListComplexities {
     family_D_genus_D_species_D_commonName
     family_D_genus_D_species_D_name
     family_D_name
+    key
     number
     updatedAt
   }
@@ -69,6 +74,7 @@ query ListComplexities {
 query ListLocations {
   listLocations {
     center
+    key
     lat
     lng
     name
@@ -81,13 +87,13 @@ query ListSessions {
     description
     groupId
     id
+    key
     location
     name
-    speakerNames_D_0
-    speakerNames_D_1
+    speakerNames
     timeEnd
     timeStart
-    tracks_D_0
+    tracks
     updatedAt
   }
 }
@@ -97,6 +103,7 @@ query ListSpeakers {
     email
     id
     instagram
+    key
     location
     name
     phone
@@ -109,6 +116,7 @@ query ListSpeakers {
 query ListTracks {
   listTracks {
     icon
+    key
     name
     updatedAt
   }

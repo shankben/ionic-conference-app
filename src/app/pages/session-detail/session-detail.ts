@@ -23,7 +23,7 @@ export class SessionDetailPage {
   ionViewWillEnter() {
     const sessionId = this.route.snapshot.paramMap.get('sessionId');
     this.conferenceData.getSessionById(sessionId).subscribe((it) => {
-      this.session = it.shift();
+      this.session = Array.isArray(it) ? it.shift() : it;
       this.isFavorite = this.userProvider.hasFavorite(this.session.name);
     });
   }

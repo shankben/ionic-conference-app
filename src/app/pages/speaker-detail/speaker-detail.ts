@@ -22,7 +22,10 @@ export class SpeakerDetailPage {
   ionViewWillEnter() {
     const speakerId = this.route.snapshot.paramMap.get('speakerId');
     this.conferenceData.getSpeakerById(speakerId)
-      .subscribe((it) => this.speaker = Array.isArray(it) ? it.shift() : it);
+      .subscribe((it) => {
+        console.log({ speaker: it });
+        this.speaker = Array.isArray(it) ? it.shift() : it;
+      });
   }
 
   openExternalUrl(url: string) {

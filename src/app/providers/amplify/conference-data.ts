@@ -1,16 +1,31 @@
 import { Injectable } from '@angular/core';
-import { Observable, from, of } from 'rxjs';
+import { Observable, from } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 import { UserData } from '../user-data';
-import { APIService, ListSessionsQuery } from './API.service';
+import {
+  APIService,
+  ListSessionsQuery,
+  ListSpeakersQuery,
+  ListTracksQuery
+} from './API.service';
 
 interface Session extends ListSessionsQuery {
   hide?: boolean;
 }
 
+interface KeyIdLike {
+  key: string;
+  id: string;
+}
+
 @Injectable({ providedIn: 'root' })
 export class AmplifyConferenceData {
+  private mapKeyToId<T>(item: KeyIdLike): T {
+    item.id = item.key;
+    return (item as unknown) as T;
+  }
+
   private filterSession(
     session: Session,
     queryWords: string[],
@@ -54,7 +69,8 @@ export class AmplifyConferenceData {
   ) { }
 
   getSessionById(sessionId: string): Observable<any> {
-    throw new Error(`Implement getSessionById(${sessionId})`);
+    return from(this.appSyncService.GetSession(sessionId))
+      .pipe(map((it) => this.mapKeyToId(it)));
   }
 
   getSessions(
@@ -70,6 +86,7 @@ export class AmplifyConferenceData {
       let shownSessions = 0;
       docs
         .sort((x, y) => x.groupId <= y.groupId ? -1 : 1)
+        .map((it) => this.mapKeyToId(it))
         .map((session: Session) => {
           this.filterSession(session, queryWords, excludeTracks, segment);
           if (!groups.has(session.groupId)) {
@@ -100,14 +117,16 @@ export class AmplifyConferenceData {
   }
 
   getSpeakerById(speakerId: string): Observable<any> {
-    return of(...[{}]);
+    return from(this.appSyncService.GetSpeaker(speakerId))
+      .pipe(map((it) => this.mapKeyToId(it)));
   }
 
-  getSpeakers(): Observable<any> {
-    return from(this.appSyncService.ListSpeakers());
+  getSpeakers(): Observable<ListSpeakersQuery[]> {
+    return from(this.appSyncService.ListSpeakers())
+      .pipe(map((docs) => docs.map((it) => this.mapKeyToId(it))));
   }
 
-  getTracks(): Observable<any> {
+  getTracks(): Observable<ListTracksQuery[]> {
     return from(this.appSyncService.ListTracks());
   }
 

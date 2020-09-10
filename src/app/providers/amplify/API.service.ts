@@ -12,6 +12,7 @@ export type GetComplexityQuery = {
   family_D_genus_D_species_D_commonName: string;
   family_D_genus_D_species_D_name: string;
   family_D_name: string;
+  key: string;
   number: number;
   updatedAt: string;
 };
@@ -19,6 +20,7 @@ export type GetComplexityQuery = {
 export type GetLocationQuery = {
   __typename: "Location";
   center: boolean | null;
+  key: string;
   lat: number;
   lng: number;
   name: string;
@@ -31,13 +33,13 @@ export type GetSessionQuery = {
   description: string | null;
   groupId: string;
   id: string;
+  key: string;
   location: string;
   name: string;
-  speakerNames_D_0: string | null;
-  speakerNames_D_1: string | null;
+  speakerNames: Array<string> | null;
   timeEnd: string;
   timeStart: string;
-  tracks_D_0: string;
+  tracks: Array<string>;
   updatedAt: string;
 };
 
@@ -47,6 +49,7 @@ export type GetSpeakerQuery = {
   email: string;
   id: string;
   instagram: string;
+  key: string;
   location: string;
   name: string;
   phone: string;
@@ -59,6 +62,7 @@ export type GetSpeakerQuery = {
 export type GetTrackQuery = {
   __typename: "Track";
   icon: string;
+  key: string;
   name: string;
   updatedAt: string;
 };
@@ -69,6 +73,7 @@ export type ListComplexitiesQuery = {
   family_D_genus_D_species_D_commonName: string;
   family_D_genus_D_species_D_name: string;
   family_D_name: string;
+  key: string;
   number: number;
   updatedAt: string;
 };
@@ -76,6 +81,7 @@ export type ListComplexitiesQuery = {
 export type ListLocationsQuery = {
   __typename: "Location";
   center: boolean | null;
+  key: string;
   lat: number;
   lng: number;
   name: string;
@@ -88,13 +94,13 @@ export type ListSessionsQuery = {
   description: string | null;
   groupId: string;
   id: string;
+  key: string;
   location: string;
   name: string;
-  speakerNames_D_0: string | null;
-  speakerNames_D_1: string | null;
+  speakerNames: Array<string> | null;
   timeEnd: string;
   timeStart: string;
-  tracks_D_0: string;
+  tracks: Array<string>;
   updatedAt: string;
 };
 
@@ -104,6 +110,7 @@ export type ListSpeakersQuery = {
   email: string;
   id: string;
   instagram: string;
+  key: string;
   location: string;
   name: string;
   phone: string;
@@ -116,6 +123,7 @@ export type ListSpeakersQuery = {
 export type ListTracksQuery = {
   __typename: "Track";
   icon: string;
+  key: string;
   name: string;
   updatedAt: string;
 };
@@ -132,6 +140,7 @@ export class APIService {
           family_D_genus_D_species_D_commonName
           family_D_genus_D_species_D_name
           family_D_name
+          key
           number
           updatedAt
         }
@@ -150,6 +159,7 @@ export class APIService {
         getLocation(key: $key) {
           __typename
           center
+          key
           lat
           lng
           name
@@ -173,13 +183,13 @@ export class APIService {
           description
           groupId
           id
+          key
           location
           name
-          speakerNames_D_0
-          speakerNames_D_1
+          speakerNames
           timeEnd
           timeStart
-          tracks_D_0
+          tracks
           updatedAt
         }
       }`;
@@ -200,6 +210,7 @@ export class APIService {
           email
           id
           instagram
+          key
           location
           name
           phone
@@ -223,6 +234,7 @@ export class APIService {
         getTrack(key: $key) {
           __typename
           icon
+          key
           name
           updatedAt
         }
@@ -244,6 +256,7 @@ export class APIService {
           family_D_genus_D_species_D_commonName
           family_D_genus_D_species_D_name
           family_D_name
+          key
           number
           updatedAt
         }
@@ -256,6 +269,7 @@ export class APIService {
         listLocations {
           __typename
           center
+          key
           lat
           lng
           name
@@ -273,13 +287,13 @@ export class APIService {
           description
           groupId
           id
+          key
           location
           name
-          speakerNames_D_0
-          speakerNames_D_1
+          speakerNames
           timeEnd
           timeStart
-          tracks_D_0
+          tracks
           updatedAt
         }
       }`;
@@ -294,6 +308,7 @@ export class APIService {
           email
           id
           instagram
+          key
           location
           name
           phone
@@ -311,6 +326,7 @@ export class APIService {
         listTracks {
           __typename
           icon
+          key
           name
           updatedAt
         }

@@ -16,9 +16,9 @@ export class ConferenceData {
     this.provider = amplifyProvider;
     window.addEventListener(
       'themeChanged',
-      (ev: CustomEvent) => this.provider = ev.detail.isDark ?
-        firebaseProvider :
-        amplifyProvider
+      (ev: CustomEvent) => this.provider = !ev.detail.isDark ?
+        amplifyProvider :
+        firebaseProvider
     );
   }
 

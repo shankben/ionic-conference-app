@@ -2,6 +2,17 @@
   <ion-split-pane contentId="main-content">
     <ion-menu contentId="main-content">
       <ion-content>
+
+        <ion-grid>
+          <ion-row class="ion-align-items-center">
+            <ion-col></ion-col>
+            <ion-col>
+              <img class="provider-logo" [src]="logo" />
+            </ion-col>
+            <ion-col></ion-col>
+          </ion-row>
+        </ion-grid>
+
         <ion-list lines="none">
           <ion-list-header>Conference</ion-list-header>
           <ion-menu-toggle

@@ -87,7 +87,7 @@ export class AmplifyConferenceData {
       docs
         .sort((x, y) => x.groupId <= y.groupId ? -1 : 1)
         .map((it) => this.mapKeyToId(it))
-        .map((session: Session) => {
+        .forEach((session: Session) => {
           this.filterSession(session, queryWords, excludeTracks, segment);
           if (!groups.has(session.groupId)) {
             groups.set(session.groupId, {
@@ -100,18 +100,20 @@ export class AmplifyConferenceData {
             group.time = session.timeStart;
           }
           group.sessions.push(session);
-
           if (!session.hide) {
             group.hide = false;
             ++shownSessions;
           }
-
-          return session;
         });
 
       return {
         shownSessions,
-        groups: Array.from(groups.values())
+        groups: Array.from(groups.values()).map((group) => {
+          group.sessions = group.sessions.sort((x, y) => {
+            return x.timeStart <= y.timeStart ? -1 : 1;
+          });
+          return group;
+        })
       };
     }));
   }
@@ -122,8 +124,11 @@ export class AmplifyConferenceData {
   }
 
   getSpeakers(): Observable<ListSpeakersQuery[]> {
-    return from(this.appSyncService.ListSpeakers())
-      .pipe(map((docs) => docs.map((it) => this.mapKeyToId(it))));
+    return from(this.appSyncService.ListSpeakers()).pipe(map((docs) => docs
+      .map((it: ListSpeakersQuery) => this.mapKeyToId(it))
+      .sort((x: ListSpeakersQuery, y: ListSpeakersQuery) =>
+        x.name <= y.name ? -1 : 1) as ListSpeakersQuery[]
+    ));
   }
 
   getTracks(): Observable<ListTracksQuery[]> {

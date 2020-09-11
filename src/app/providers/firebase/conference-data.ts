@@ -70,7 +70,7 @@ export class FirebaseConferenceData {
       docs
         .map((it) => it.data())
         .sort((x, y) => x.groupId <= y.groupId ? -1 : 1)
-        .map((session) => {
+        .forEach((session) => {
           this.filterSession(session, queryWords, excludeTracks, segment);
           if (!groups.has(session.groupId)) {
             groups.set(session.groupId, {
@@ -87,12 +87,16 @@ export class FirebaseConferenceData {
             group.hide = false;
             ++shownSessions;
           }
-          return session;
         });
 
       return {
         shownSessions,
-        groups: Array.from(groups.values())
+        groups: Array.from(groups.values()).map((group) => {
+          group.sessions = group.sessions.sort((x, y) => {
+            return x.timeStart <= y.timeStart ? -1 : 1;
+          });
+          return group;
+        })
       };
     }));
   }

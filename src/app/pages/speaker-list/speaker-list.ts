@@ -9,12 +9,16 @@ import { ConferenceData } from '../../providers/conference-data';
 export class SpeakerListPage {
   speakers: any[] = [];
 
-  constructor(public conferenceData: ConferenceData) {}
+  private load() {
+    this.conferenceData.getSpeakers()
+      .subscribe((speakers: any[]) => this.speakers = speakers);
+  }
+
+  constructor(public conferenceData: ConferenceData) {
+    window.addEventListener('themeChanged', () => this.load());
+  }
 
   ionViewDidEnter() {
-    this.conferenceData.getSpeakers().subscribe((speakers: any[]) => {
-      console.log(speakers);
-      this.speakers = speakers;
-    });
+    this.load();
   }
 }

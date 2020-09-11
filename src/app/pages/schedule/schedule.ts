@@ -43,7 +43,9 @@ export class SchedulePage implements OnInit {
     public router: Router,
     public routerOutlet: IonRouterOutlet,
     public user: UserData
-  ) { }
+  ) {
+    window.addEventListener('themeChanged', () => this.updateSchedule());
+  }
 
   ngOnInit() {
     this.updateSchedule();

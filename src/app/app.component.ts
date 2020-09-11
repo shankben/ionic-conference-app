@@ -29,6 +29,10 @@ export class AppComponent implements OnInit, AfterViewInit {
 
   dark = environment.provider === 'firebase';
 
+  get logo() {
+    return `/assets/img/${(!this.dark ? 'amplify' : 'firebase')}-symbol-logo.png`;
+  }
+
   user: User;
 
   private updateSignedInStatus(signedIn: boolean) {

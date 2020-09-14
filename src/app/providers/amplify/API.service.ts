@@ -8,10 +8,19 @@ import { Observable } from "zen-observable-ts";
 
 export type GetComplexityQuery = {
   __typename: "Complexity";
-  family_D_genus_D_name: string;
-  family_D_genus_D_species_D_commonName: string;
-  family_D_genus_D_species_D_name: string;
-  family_D_name: string;
+  family: {
+    __typename: "ComplexityFamily";
+    genus: {
+      __typename: "ComplexityGenus";
+      name: string;
+      species: {
+        __typename: "ComplexitySpecies";
+        commonName: string;
+        name: string;
+      } | null;
+    } | null;
+    name: string;
+  } | null;
   key: string;
   number: number;
   updatedAt: string;
@@ -20,11 +29,26 @@ export type GetComplexityQuery = {
 export type GetLocationQuery = {
   __typename: "Location";
   center: boolean | null;
+  city: string;
   key: string;
   lat: number;
   lng: number;
   name: string;
+  state: string;
   updatedAt: string;
+  weather: {
+    __typename: "LocationWeather";
+    description: string;
+    feelsLike: number;
+    humidity: number;
+    iconUrl: string;
+    pressure: number;
+    status: string;
+    temp: number;
+    tempMax: number;
+    tempMin: number;
+    updatedAt: string;
+  } | null;
 };
 
 export type GetSessionQuery = {
@@ -69,10 +93,19 @@ export type GetTrackQuery = {
 
 export type ListComplexitiesQuery = {
   __typename: "Complexity";
-  family_D_genus_D_name: string;
-  family_D_genus_D_species_D_commonName: string;
-  family_D_genus_D_species_D_name: string;
-  family_D_name: string;
+  family: {
+    __typename: "ComplexityFamily";
+    genus: {
+      __typename: "ComplexityGenus";
+      name: string;
+      species: {
+        __typename: "ComplexitySpecies";
+        commonName: string;
+        name: string;
+      } | null;
+    } | null;
+    name: string;
+  } | null;
   key: string;
   number: number;
   updatedAt: string;
@@ -81,11 +114,26 @@ export type ListComplexitiesQuery = {
 export type ListLocationsQuery = {
   __typename: "Location";
   center: boolean | null;
+  city: string;
   key: string;
   lat: number;
   lng: number;
   name: string;
+  state: string;
   updatedAt: string;
+  weather: {
+    __typename: "LocationWeather";
+    description: string;
+    feelsLike: number;
+    humidity: number;
+    iconUrl: string;
+    pressure: number;
+    status: string;
+    temp: number;
+    tempMax: number;
+    tempMin: number;
+    updatedAt: string;
+  } | null;
 };
 
 export type ListSessionsQuery = {
@@ -136,10 +184,19 @@ export class APIService {
     const statement = `query GetComplexity($key: String) {
         getComplexity(key: $key) {
           __typename
-          family_D_genus_D_name
-          family_D_genus_D_species_D_commonName
-          family_D_genus_D_species_D_name
-          family_D_name
+          family {
+            __typename
+            genus {
+              __typename
+              name
+              species {
+                __typename
+                commonName
+                name
+              }
+            }
+            name
+          }
           key
           number
           updatedAt
@@ -159,11 +216,26 @@ export class APIService {
         getLocation(key: $key) {
           __typename
           center
+          city
           key
           lat
           lng
           name
+          state
           updatedAt
+          weather {
+            __typename
+            description
+            feelsLike
+            humidity
+            iconUrl
+            pressure
+            status
+            temp
+            tempMax
+            tempMin
+            updatedAt
+          }
         }
       }`;
     const gqlAPIServiceArguments: any = {};
@@ -252,10 +324,19 @@ export class APIService {
     const statement = `query ListComplexities {
         listComplexities {
           __typename
-          family_D_genus_D_name
-          family_D_genus_D_species_D_commonName
-          family_D_genus_D_species_D_name
-          family_D_name
+          family {
+            __typename
+            genus {
+              __typename
+              name
+              species {
+                __typename
+                commonName
+                name
+              }
+            }
+            name
+          }
           key
           number
           updatedAt
@@ -269,11 +350,26 @@ export class APIService {
         listLocations {
           __typename
           center
+          city
           key
           lat
           lng
           name
+          state
           updatedAt
+          weather {
+            __typename
+            description
+            feelsLike
+            humidity
+            iconUrl
+            pressure
+            status
+            temp
+            tempMax
+            tempMin
+            updatedAt
+          }
         }
       }`;
     const response = (await API.graphql(graphqlOperation(statement))) as any;

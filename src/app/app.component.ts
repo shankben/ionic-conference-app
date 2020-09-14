@@ -16,6 +16,7 @@ import { SwUpdate } from '@angular/service-worker';
 
 import { User } from './interfaces/user';
 import { UserData } from './providers/user-data';
+import { ConferenceData } from './providers/conference-data';
 import { environment } from '../environments/environment';
 
 @Component({
@@ -28,6 +29,7 @@ export class AppComponent implements OnInit, AfterViewInit {
   dark = environment.provider === 'firebase';
   signedIn = false;
   user: User;
+  weather: any;
 
   get logo() {
     return `/assets/img/${(!this.dark ?
@@ -55,10 +57,19 @@ export class AppComponent implements OnInit, AfterViewInit {
     private statusBar: StatusBar,
     private storage: Storage,
     private userData: UserData,
+    private conferenceData: ConferenceData,
     private swUpdate: SwUpdate,
     private toastCtrl: ToastController,
   ) {
     this.initializeApp();
+  }
+
+  private loadData() {
+    this.userData.user().then((res) => this.user = res);
+    this.conferenceData.getLocations().subscribe((locations: any) => {
+      const center = locations.find((it: any) => it.center);
+      this.weather = center.weather;
+    });
   }
 
   private async initializeApp() {
@@ -66,10 +77,10 @@ export class AppComponent implements OnInit, AfterViewInit {
     await this.storage.set('isDarkTheme', this.dark);
     this.statusBar.styleDefault();
     this.splashScreen.hide();
-    this.user = await this.userData.user();
   }
 
   async ngOnInit() {
+    this.loadData();
     this.listenForSignInEvents();
     this.swUpdate.available.subscribe(async () => {
       const toast = await this.toastCtrl.create({
@@ -95,6 +106,7 @@ export class AppComponent implements OnInit, AfterViewInit {
           window.dispatchEvent(new CustomEvent('themeChanged', {
             detail: { isDark }
           }));
+          this.loadData();
         }
       });
     });

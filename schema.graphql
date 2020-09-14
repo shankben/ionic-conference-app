@@ -3,21 +3,49 @@ schema {
 }
 
 type Complexity {
-  family_D_genus_D_name: String!
-  family_D_genus_D_species_D_commonName: String!
-  family_D_genus_D_species_D_name: String!
-  family_D_name: String!
+  family: ComplexityFamily
   key: ID!
   number: Int!
   updatedAt: AWSDateTime!
 }
 
+type ComplexityFamily {
+  genus: ComplexityGenus
+  name: String!
+}
+
+type ComplexityGenus {
+  name: String!
+  species: ComplexitySpecies
+}
+
+type ComplexitySpecies {
+  commonName: String!
+  name: String!
+}
+
 type Location {
   center: Boolean
+  city: String!
   key: ID!
   lat: Float!
   lng: Float!
   name: String!
+  state: String!
+  updatedAt: AWSDateTime!
+  weather: LocationWeather
+}
+
+type LocationWeather {
+  description: String!
+  feelsLike: Float!
+  humidity: Int!
+  iconUrl: String!
+  pressure: Int!
+  status: String!
+  temp: Float!
+  tempMax: Float!
+  tempMin: Float!
   updatedAt: AWSDateTime!
 }
 

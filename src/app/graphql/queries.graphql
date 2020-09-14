@@ -1,10 +1,16 @@
 # this is an auto generated file. This will be overwritten
 query GetComplexity($key: String) {
   getComplexity(key: $key) {
-    family_D_genus_D_name
-    family_D_genus_D_species_D_commonName
-    family_D_genus_D_species_D_name
-    family_D_name
+    family {
+      genus {
+        name
+        species {
+          commonName
+          name
+        }
+      }
+      name
+    }
     key
     number
     updatedAt
@@ -13,11 +19,25 @@ query GetComplexity($key: String) {
 query GetLocation($key: String) {
   getLocation(key: $key) {
     center
+    city
     key
     lat
     lng
     name
+    state
     updatedAt
+    weather {
+      description
+      feelsLike
+      humidity
+      iconUrl
+      pressure
+      status
+      temp
+      tempMax
+      tempMin
+      updatedAt
+    }
   }
 }
 query GetSession($key: String) {
@@ -62,10 +82,16 @@ query GetTrack($key: String) {
 }
 query ListComplexities {
   listComplexities {
-    family_D_genus_D_name
-    family_D_genus_D_species_D_commonName
-    family_D_genus_D_species_D_name
-    family_D_name
+    family {
+      genus {
+        name
+        species {
+          commonName
+          name
+        }
+      }
+      name
+    }
     key
     number
     updatedAt
@@ -74,11 +100,25 @@ query ListComplexities {
 query ListLocations {
   listLocations {
     center
+    city
     key
     lat
     lng
     name
+    state
     updatedAt
+    weather {
+      description
+      feelsLike
+      humidity
+      iconUrl
+      pressure
+      status
+      temp
+      tempMax
+      tempMin
+      updatedAt
+    }
   }
 }
 query ListSessions {

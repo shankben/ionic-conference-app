@@ -20,8 +20,8 @@ export class UserData {
     window.addEventListener(
       'themeChanged',
       (ev: CustomEvent) => this.provider = !ev.detail.isDark ?
-        this.firebaseProvider :
-        this.amplifyProvider
+        this.amplifyProvider :
+        this.firebaseProvider
     );
   }
 

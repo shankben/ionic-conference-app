@@ -12,7 +12,7 @@ import { environment } from '../../../environments/environment';
 @Injectable({ providedIn: 'root' })
 export class FirebaseUserData {
   private onAuthStateChanged(user: any) {
-    if (user) {
+    if (user && !user.isAnonymous) {
       window.dispatchEvent(new CustomEvent('user:signin'));
     }
   }
@@ -20,6 +20,7 @@ export class FirebaseUserData {
   constructor(public storage: Storage) {
     firebase.initializeApp(environment.firebase);
     firebase.auth().onAuthStateChanged(this.onAuthStateChanged);
+    firebase.auth().signInAnonymously();
   }
 
   async user(): Promise<User> {

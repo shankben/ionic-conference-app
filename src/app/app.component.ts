@@ -25,27 +25,25 @@ import { environment } from '../environments/environment';
   encapsulation: ViewEncapsulation.None
 })
 export class AppComponent implements OnInit, AfterViewInit {
-  signedIn = false;
-
   dark = environment.provider === 'firebase';
-
-  get logo() {
-    return `/assets/img/${(!this.dark ? 'amplify' : 'firebase')}-symbol-logo.png`;
-  }
-
+  signedIn = false;
   user: User;
 
-  private updateSignedInStatus(signedIn: boolean) {
-    this.signedIn = signedIn;
+  get logo() {
+    return `/assets/img/${(!this.dark ?
+      'amplify' :
+      'firebase'
+    )}-symbol-logo.png`;
   }
 
   private listenForSignInEvents() {
-    window.addEventListener('user:signin', () =>
-      this.updateSignedInStatus(true));
-    window.addEventListener('user:signup', () =>
-      this.updateSignedInStatus(true));
-    window.addEventListener('user:signout', () =>
-      this.updateSignedInStatus(false));
+    const updateUserStatus = () => {
+      this.signedIn = true;
+      this.userData.user().then((user) => this.user = user);
+    };
+    window.addEventListener('user:signin', updateUserStatus);
+    window.addEventListener('user:signup', updateUserStatus);
+    window.addEventListener('user:signout', () => this.signedIn = false);
   }
 
   constructor(
@@ -69,8 +67,6 @@ export class AppComponent implements OnInit, AfterViewInit {
     this.statusBar.styleDefault();
     this.splashScreen.hide();
     this.user = await this.userData.user();
-    window.addEventListener('user:signin', () =>
-      this.userData.user().then((user) => this.user = user));
   }
 
   async ngOnInit() {

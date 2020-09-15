@@ -135,14 +135,15 @@
 
         <ion-list *ngIf="weather" lines="none">
           <ion-list-header>Current Weather</ion-list-header>
-          <ion-menu-toggle autoHide="false">
-            <ion-item detail="false">
-              <img class="provider-logo" [src]="weather.iconUrl" />
-              <ion-label>{{ weather.description }}</ion-label>
-              <ion-label>{{ weather.temp.toFixed(1) }} °F</ion-label>
-            </ion-item>
-          </ion-menu-toggle>
-        </ion-list>        
+          <ion-item>
+            <ion-note>{{ weather.updatedAt }}</ion-note>
+          </ion-item>
+          <ion-item>
+            <img class="provider-logo" [src]="weather.iconUrl" />
+            <ion-label>{{ weather.description }}</ion-label>
+            <ion-label>{{ weather.temp.toFixed(1) }} °F</ion-label>
+          </ion-item>
+        </ion-list>
       </ion-content>
     </ion-menu>
 

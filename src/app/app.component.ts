@@ -69,6 +69,14 @@ export class AppComponent implements OnInit, AfterViewInit {
     this.conferenceData.getLocations().subscribe((locations: any) => {
       const center = locations.find((it: any) => it.center);
       this.weather = center.weather;
+      this.weather.updatedAt = 'Updated ' + new Intl.DateTimeFormat('en', {
+        year: 'numeric',
+        month: 'short',
+        day: '2-digit',
+        hour: 'numeric',
+        hour12: true,
+        minute: 'numeric'
+      }).format(new Date(this.weather.updatedAt));
     });
   }
 

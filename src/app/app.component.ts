@@ -14,6 +14,8 @@ import { DOCUMENT} from '@angular/common';
 import { Router } from '@angular/router';
 import { SwUpdate } from '@angular/service-worker';
 
+import { Hub } from 'aws-amplify';
+
 import { User } from './interfaces/user';
 import { UserData } from './providers/user-data';
 import { ConferenceData } from './providers/conference-data';
@@ -46,6 +48,10 @@ export class AppComponent implements OnInit, AfterViewInit {
     window.addEventListener('user:signin', updateUserStatus);
     window.addEventListener('user:signup', updateUserStatus);
     window.addEventListener('user:signout', () => this.signedIn = false);
+
+    Hub.listen(/.*/, (data) => {
+      console.log('Listening for all messages: ', data.payload.data);
+    });
   }
 
   constructor(

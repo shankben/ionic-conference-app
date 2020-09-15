@@ -32,6 +32,8 @@ export class ConferenceData {
     excludeTracks: any[] = [],
     segment = 'all'
   ): Observable<any> {
+    console.log(new Error().stack);
+
     return this.provider.getSessions(
       dayIndex,
       queryText,

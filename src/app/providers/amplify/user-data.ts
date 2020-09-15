@@ -26,23 +26,26 @@ export class AmplifyUserData {
   }
 
   async user(): Promise<User> {
-    let pictureUrl: string;
-    const user = await Auth.currentAuthenticatedUser();
     try {
+      const user = await Auth.currentAuthenticatedUser();
       if (!user.attributes.picture) {
         throw new Error();
       }
       const { picture } = user.attributes;
       const res = await Storage.get(picture, { download: true }) as any;
-      pictureUrl = await this.blobToDataUrl(res.Body);
+      const pictureUrl = await this.blobToDataUrl(res.Body);
+      return {
+        username: user.attributes.preferred_username || user.username,
+        email: user.attributes.email,
+        picture: pictureUrl
+      };
     } catch (err) {
-      pictureUrl = 'http://www.gravatar.com/avatar';
+      return {
+        username: 'anonymous',
+        email: 'anonymous',
+        picture: 'http://www.gravatar.com/avatar'
+      };
     }
-    return {
-      username: user.attributes.preferred_username || user.username,
-      email: user.attributes.email,
-      picture: pictureUrl
-    };
   }
 
   async updateUser(userOptions: UserUpdate) {
@@ -114,6 +117,10 @@ export class AmplifyUserData {
   }
 
   async isSignedIn(): Promise<boolean> {
-    return Boolean(await Auth.currentAuthenticatedUser());
+    try {
+      return Boolean(await Auth.currentAuthenticatedUser());
+    } catch (err) {
+      return false;
+    }
   }
 }

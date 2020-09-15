@@ -1,4 +1,5 @@
 {
+  "private": true,
   "name": "ionic-conference-app",
   "version": "0.0.0",
   "description": "Ionic Conference App",
@@ -17,7 +18,6 @@
     "type": "git",
     "url": "https://github.com/ionic-team/ionic-conference-app.git"
   },
-  "private": true,
   "dependencies": {
     "@angular/common": "^10.1.1",
     "@angular/core": "^10.1.1",

@@ -28,7 +28,7 @@ export class FirebaseUserData {
       return {
         username: user.displayName || user.email,
         email: user.email,
-        picture: user.photoURL
+        picture: user.photoURL ?? 'http://www.gravatar.com/avatar'
       };
     }
   }

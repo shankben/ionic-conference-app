@@ -22,7 +22,7 @@
 
     <ion-tab-button
       tab="account"
-      *ngIf="signedIn && user && user.picture; else anonymous">
+      *ngIf="signedIn && user && user.picture">
       <ion-avatar class="avatar">
         <img [src]="user.picture" alt="avatar" />
       </ion-avatar>

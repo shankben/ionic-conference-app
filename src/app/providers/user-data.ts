@@ -13,9 +13,9 @@ export class UserData {
   private provider: AmplifyUserData | FirebaseUserData;
   private favorites: string[] = [];
 
-  constructor(public storage: Storage) {
-    this.firebaseProvider = new FirebaseUserData(storage);
-    this.amplifyProvider = new AmplifyUserData(storage);
+  constructor(private readonly storage: Storage) {
+    this.firebaseProvider = new FirebaseUserData();
+    this.amplifyProvider = new AmplifyUserData();
     this.provider = this.amplifyProvider;
     window.addEventListener(
       'themeChanged',

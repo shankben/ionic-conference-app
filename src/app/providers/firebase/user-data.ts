@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { Storage } from '@ionic/storage';
 
 import * as firebase from 'firebase/app';
 import 'firebase/auth';
@@ -17,7 +16,7 @@ export class FirebaseUserData {
     }
   }
 
-  constructor(public storage: Storage) {
+  constructor() {
     firebase.initializeApp(environment.firebase);
     firebase.auth().onAuthStateChanged(this.onAuthStateChanged);
     firebase.auth().signInAnonymously();

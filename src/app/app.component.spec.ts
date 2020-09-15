@@ -3,6 +3,18 @@ import { Router } from '@angular/router';
 import { SwUpdate } from '@angular/service-worker';
 import { TestBed, async } from '@angular/core/testing';
 
+import { IonicModule } from '@ionic/angular';
+
+import { HttpClientModule } from '@angular/common/http';
+import { BrowserModule } from '@angular/platform-browser';
+import { ServiceWorkerModule } from '@angular/service-worker';
+import { FormsModule } from '@angular/forms';
+import { AngularFireModule } from '@angular/fire';
+import { AngularFirestoreModule } from '@angular/fire/firestore';
+
+import { AppRoutingModule } from './app-routing.module';
+import { environment } from '../environments/environment';
+
 import { MenuController, Platform } from '@ionic/angular';
 import { SplashScreen } from '@ionic-native/splash-screen/ngx';
 import { StatusBar } from '@ionic-native/status-bar/ngx';
@@ -34,7 +46,19 @@ describe('AppComponent', () => {
 
     TestBed.configureTestingModule({
       declarations: [AppComponent],
-      imports: [IonicStorageModule.forRoot()],
+      imports: [
+        IonicStorageModule.forRoot(),
+        BrowserModule,
+        AppRoutingModule,
+        HttpClientModule,
+        FormsModule,
+        IonicModule.forRoot(),
+        AngularFireModule.initializeApp(environment.firebase),
+        AngularFirestoreModule,
+        ServiceWorkerModule.register('ngsw-worker.js', {
+          enabled: environment.production
+        })
+      ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
       providers: [
         { provide: MenuController, useValue: menuSpy },

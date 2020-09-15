@@ -6,7 +6,6 @@ import { UserData } from '../user-data';
 
 @Injectable({ providedIn: 'root' })
 export class FirebaseConferenceData {
-
   private filterSession(
     session: any,
     queryWords: string[],
@@ -46,11 +45,11 @@ export class FirebaseConferenceData {
 
   constructor(
     public user: UserData,
-    public firestore: AngularFirestore
+    private readonly afs: AngularFirestore
   ) { }
 
   getSessionById(sessionId: string): Observable<any> {
-    return this.firestore
+    return this.afs
       .collection('sessions', (ref) => ref.limit(1)
         .where('id', '==', sessionId))
       .valueChanges();
@@ -65,7 +64,7 @@ export class FirebaseConferenceData {
     queryText = queryText.toLowerCase().replace(/,|\.|-/g, ' ');
     const queryWords = queryText.split(' ').filter((it) => !!it.trim().length);
     const groups = new Map();
-    return this.firestore.collection('sessions').get().pipe(map(({ docs }) => {
+    return this.afs.collection('sessions').get().pipe(map(({ docs }) => {
       let shownSessions = 0;
       docs
         .map((it) => it.data())
@@ -102,23 +101,23 @@ export class FirebaseConferenceData {
   }
 
   getSpeakerById(speakerId: string): Observable<any> {
-    return this.firestore
+    return this.afs
       .collection('speakers', (ref) => ref.limit(1)
         .where('id', '==', speakerId))
       .valueChanges();
   }
 
   getSpeakers(): Observable<any> {
-    return this.firestore
+    return this.afs
       .collection('speakers', (ref) => ref.orderBy('name'))
       .valueChanges();
   }
 
   getTracks(): Observable<any> {
-    return this.firestore.collection('tracks').valueChanges();
+    return this.afs.collection('tracks').valueChanges();
   }
 
   getLocations(): Observable<any> {
-    return this.firestore.collection('locations').valueChanges();
+    return this.afs.collection('locations').valueChanges();
   }
 }

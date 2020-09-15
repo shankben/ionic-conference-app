@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { Storage as IonicStorage } from '@ionic/storage';
 import Amplify, { Auth, Storage } from 'aws-amplify';
 import { CognitoUser } from '@aws-amplify/auth';
 
@@ -10,15 +9,19 @@ import { environment } from '../../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class AmplifyUserData {
-  constructor(public storage: IonicStorage) {
+  constructor() {
     Amplify.configure(environment.amplify);
   }
 
   private async blobToDataUrl(blob: Blob): Promise<string> {
-    return new Promise((resolve) => {
-      const fr = new FileReader();
-      fr.onload = (e) => resolve(e.target.result as string);
-      fr.readAsDataURL(blob);
+    return new Promise((resolve, reject) => {
+      try {
+        const fr = new FileReader();
+        fr.onload = (e) => resolve(e.target.result as string);
+        fr.readAsDataURL(blob);
+      } catch (err) {
+        reject(err);
+      }
     });
   }
 

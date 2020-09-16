@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
-import { Observable, from } from 'rxjs';
+import { Observer, Observable, from, merge } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 import { UserData } from '../user-data';
 import {
   APIService,
+  ListLocationsQuery,
   ListSessionsQuery,
   ListSpeakersQuery,
   ListTracksQuery
@@ -109,9 +110,8 @@ export class AmplifyConferenceData {
       return {
         shownSessions,
         groups: Array.from(groups.values()).map((group) => {
-          group.sessions = group.sessions.sort((x, y) => {
-            return x.timeStart <= y.timeStart ? -1 : 1;
-          });
+          group.sessions = group.sessions
+            .sort((x, y) => x.timeStart <= y.timeStart ? -1 : 1);
           return group;
         })
       };
@@ -135,7 +135,13 @@ export class AmplifyConferenceData {
     return from(this.appSyncService.ListTracks());
   }
 
-  getLocations(): Observable<any> {
-    return from(this.appSyncService.ListLocations());
+  getLocations(): Observable<ListLocationsQuery[]> {
+    const ls = from(this.appSyncService.ListLocations());
+    const sub = Observable.create((observer: Observer<any>) => {
+      this.appSyncService.UpdatedLocationListener.subscribe((res: any) => {
+        observer.next([res.value.data.updatedLocation]);
+      });
+    });
+    return merge(ls, sub);
   }
 }

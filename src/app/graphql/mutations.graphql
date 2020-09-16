@@ -1,0 +1,82 @@
+# this is an auto generated file. This will be overwritten
+mutation UpdateComplexity($key: ID!) {
+  updateComplexity(key: $key) {
+    family {
+      genus {
+        name
+        species {
+          commonName
+          name
+        }
+      }
+      name
+    }
+    key
+    number
+    updatedAt
+  }
+}
+mutation UpdateLocation($key: ID!) {
+  updateLocation(key: $key) {
+    center
+    city
+    key
+    lat
+    lng
+    name
+    state
+    updatedAt
+    weather {
+      description
+      feelsLike
+      humidity
+      iconUrl
+      pressure
+      status
+      temp
+      tempMax
+      tempMin
+      updatedAt
+    }
+  }
+}
+mutation UpdateSession($key: ID!) {
+  updateSession(key: $key) {
+    date
+    description
+    groupId
+    id
+    key
+    location
+    name
+    speakerNames
+    timeEnd
+    timeStart
+    tracks
+    updatedAt
+  }
+}
+mutation UpdateSpeaker($key: ID!) {
+  updateSpeaker(key: $key) {
+    about
+    email
+    id
+    instagram
+    key
+    location
+    name
+    phone
+    profilePic
+    title
+    twitter
+    updatedAt
+  }
+}
+mutation UpdateTrack($key: ID!) {
+  updateTrack(key: $key) {
+    icon
+    key
+    name
+    updatedAt
+  }
+}

@@ -1,5 +1,5 @@
 # this is an auto generated file. This will be overwritten
-query GetComplexity($key: String) {
+query GetComplexity($key: ID) {
   getComplexity(key: $key) {
     family {
       genus {
@@ -16,7 +16,7 @@ query GetComplexity($key: String) {
     updatedAt
   }
 }
-query GetLocation($key: String) {
+query GetLocation($key: ID) {
   getLocation(key: $key) {
     center
     city
@@ -40,7 +40,7 @@ query GetLocation($key: String) {
     }
   }
 }
-query GetSession($key: String) {
+query GetSession($key: ID) {
   getSession(key: $key) {
     date
     description
@@ -56,7 +56,7 @@ query GetSession($key: String) {
     updatedAt
   }
 }
-query GetSpeaker($key: String) {
+query GetSpeaker($key: ID) {
   getSpeaker(key: $key) {
     about
     email
@@ -72,7 +72,7 @@ query GetSpeaker($key: String) {
     updatedAt
   }
 }
-query GetTrack($key: String) {
+query GetTrack($key: ID) {
   getTrack(key: $key) {
     icon
     key

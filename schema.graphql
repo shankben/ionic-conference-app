@@ -1,5 +1,7 @@
 schema {
   query: Query
+  mutation: Mutation
+  subscription: Subscription
 }
 
 type Complexity {
@@ -49,12 +51,20 @@ type LocationWeather {
   updatedAt: AWSDateTime!
 }
 
+type Mutation {
+  updateComplexity(key: ID!): Complexity
+  updateLocation(key: ID!): Location
+  updateSession(key: ID!): Session
+  updateSpeaker(key: ID!): Speaker
+  updateTrack(key: ID!): Track
+}
+
 type Query {
-  getComplexity(key: String): Complexity
-  getLocation(key: String): Location
-  getSession(key: String): Session
-  getSpeaker(key: String): Speaker
-  getTrack(key: String): Track
+  getComplexity(key: ID): Complexity
+  getLocation(key: ID): Location
+  getSession(key: ID): Session
+  getSpeaker(key: ID): Speaker
+  getTrack(key: ID): Track
   listComplexities: [Complexity]
   listLocations: [Location]
   listSessions: [Session]
@@ -90,6 +100,14 @@ type Speaker {
   title: String!
   twitter: String!
   updatedAt: AWSDateTime!
+}
+
+type Subscription {
+  updatedComplexity: Complexity @aws_subscribe(mutations : ["updateComplexity"])
+  updatedLocation: Location @aws_subscribe(mutations : ["updateLocation"])
+  updatedSession: Session @aws_subscribe(mutations : ["updateSession"])
+  updatedSpeaker: Speaker @aws_subscribe(mutations : ["updateSpeaker"])
+  updatedTrack: Track @aws_subscribe(mutations : ["updateTrack"])
 }
 
 type Track {

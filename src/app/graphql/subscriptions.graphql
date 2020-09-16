@@ -1,0 +1,82 @@
+# this is an auto generated file. This will be overwritten
+subscription UpdatedComplexity {
+  updatedComplexity {
+    family {
+      genus {
+        name
+        species {
+          commonName
+          name
+        }
+      }
+      name
+    }
+    key
+    number
+    updatedAt
+  }
+}
+subscription UpdatedLocation {
+  updatedLocation {
+    center
+    city
+    key
+    lat
+    lng
+    name
+    state
+    updatedAt
+    weather {
+      description
+      feelsLike
+      humidity
+      iconUrl
+      pressure
+      status
+      temp
+      tempMax
+      tempMin
+      updatedAt
+    }
+  }
+}
+subscription UpdatedSession {
+  updatedSession {
+    date
+    description
+    groupId
+    id
+    key
+    location
+    name
+    speakerNames
+    timeEnd
+    timeStart
+    tracks
+    updatedAt
+  }
+}
+subscription UpdatedSpeaker {
+  updatedSpeaker {
+    about
+    email
+    id
+    instagram
+    key
+    location
+    name
+    phone
+    profilePic
+    title
+    twitter
+    updatedAt
+  }
+}
+subscription UpdatedTrack {
+  updatedTrack {
+    icon
+    key
+    name
+    updatedAt
+  }
+}

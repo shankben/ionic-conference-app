@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-
+const fs = require("fs");
 const AWS = require("aws-sdk");
 AWS.config.update({ region:
   process.env.CDK_DEPLOY_REGION ||
@@ -21,14 +21,14 @@ const getStackOutput = async (StackName, key) => (await cfn
 
 async function main() {
   const params = {
-    format: "SDL"
+    format: "SDL",
     apiId: await getStackOutput(
       "ionic-conference-demo-ApiStack",
       "AmplifyConfigAppSyncApiId"
     )
   };
   const res = await appSync.getIntrospectionSchema(params).promise();
-  console.log(res);
+  fs.writeFileSync("schema.graphql", res.schema.toString());
 }
 
 main().catch(console.error);

@@ -4,28 +4,6 @@ schema {
   subscription: Subscription
 }
 
-type Complexity {
-  family: ComplexityFamily
-  key: ID!
-  number: Int!
-  updatedAt: AWSDateTime!
-}
-
-type ComplexityFamily {
-  genus: ComplexityGenus
-  name: String!
-}
-
-type ComplexityGenus {
-  name: String!
-  species: ComplexitySpecies
-}
-
-type ComplexitySpecies {
-  commonName: String!
-  name: String!
-}
-
 type Location {
   center: Boolean
   city: String!
@@ -52,20 +30,17 @@ type LocationWeather {
 }
 
 type Mutation {
-  updateComplexity(key: ID!): Complexity
-  updateLocation(key: ID!): Location
-  updateSession(key: ID!): Session
-  updateSpeaker(key: ID!): Speaker
-  updateTrack(key: ID!): Track
+  updateLocation(input: LocationInput!): Location
+  updateSession(input: SessionInput!): Session
+  updateSpeaker(input: SpeakerInput!): Speaker
+  updateTrack(input: TrackInput!): Track
 }
 
 type Query {
-  getComplexity(key: ID): Complexity
-  getLocation(key: ID): Location
-  getSession(key: ID): Session
-  getSpeaker(key: ID): Speaker
-  getTrack(key: ID): Track
-  listComplexities: [Complexity]
+  getLocation(key: ID!): Location
+  getSession(key: ID!): Session
+  getSpeaker(key: ID!): Speaker
+  getTrack(key: ID!): Track
   listLocations: [Location]
   listSessions: [Session]
   listSpeakers: [Speaker]
@@ -103,7 +78,6 @@ type Speaker {
 }
 
 type Subscription {
-  updatedComplexity: Complexity @aws_subscribe(mutations : ["updateComplexity"])
   updatedLocation: Location @aws_subscribe(mutations : ["updateLocation"])
   updatedSession: Session @aws_subscribe(mutations : ["updateSession"])
   updatedSpeaker: Speaker @aws_subscribe(mutations : ["updateSpeaker"])
@@ -115,4 +89,20 @@ type Track {
   key: ID!
   name: String!
   updatedAt: AWSDateTime!
+}
+
+input LocationInput {
+  key: ID!
+}
+
+input SessionInput {
+  key: ID!
+}
+
+input SpeakerInput {
+  key: ID!
+}
+
+input TrackInput {
+  key: ID!
 }

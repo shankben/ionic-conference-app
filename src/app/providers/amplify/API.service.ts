@@ -6,24 +6,20 @@ import API, { graphqlOperation } from "@aws-amplify/api";
 import { GraphQLResult } from "@aws-amplify/api/lib/types";
 import { Observable } from "zen-observable-ts";
 
-export type UpdateComplexityMutation = {
-  __typename: "Complexity";
-  family: {
-    __typename: "ComplexityFamily";
-    genus: {
-      __typename: "ComplexityGenus";
-      name: string;
-      species: {
-        __typename: "ComplexitySpecies";
-        commonName: string;
-        name: string;
-      } | null;
-    } | null;
-    name: string;
-  } | null;
+export type LocationInput = {
   key: string;
-  number: number;
-  updatedAt: string;
+};
+
+export type SessionInput = {
+  key: string;
+};
+
+export type SpeakerInput = {
+  key: string;
+};
+
+export type TrackInput = {
+  key: string;
 };
 
 export type UpdateLocationMutation = {
@@ -88,26 +84,6 @@ export type UpdateTrackMutation = {
   icon: string;
   key: string;
   name: string;
-  updatedAt: string;
-};
-
-export type GetComplexityQuery = {
-  __typename: "Complexity";
-  family: {
-    __typename: "ComplexityFamily";
-    genus: {
-      __typename: "ComplexityGenus";
-      name: string;
-      species: {
-        __typename: "ComplexitySpecies";
-        commonName: string;
-        name: string;
-      } | null;
-    } | null;
-    name: string;
-  } | null;
-  key: string;
-  number: number;
   updatedAt: string;
 };
 
@@ -176,26 +152,6 @@ export type GetTrackQuery = {
   updatedAt: string;
 };
 
-export type ListComplexitiesQuery = {
-  __typename: "Complexity";
-  family: {
-    __typename: "ComplexityFamily";
-    genus: {
-      __typename: "ComplexityGenus";
-      name: string;
-      species: {
-        __typename: "ComplexitySpecies";
-        commonName: string;
-        name: string;
-      } | null;
-    } | null;
-    name: string;
-  } | null;
-  key: string;
-  number: number;
-  updatedAt: string;
-};
-
 export type ListLocationsQuery = {
   __typename: "Location";
   center: boolean | null;
@@ -258,26 +214,6 @@ export type ListTracksQuery = {
   icon: string;
   key: string;
   name: string;
-  updatedAt: string;
-};
-
-export type UpdatedComplexitySubscription = {
-  __typename: "Complexity";
-  family: {
-    __typename: "ComplexityFamily";
-    genus: {
-      __typename: "ComplexityGenus";
-      name: string;
-      species: {
-        __typename: "ComplexitySpecies";
-        commonName: string;
-        name: string;
-      } | null;
-    } | null;
-    name: string;
-  } | null;
-  key: string;
-  number: number;
   updatedAt: string;
 };
 
@@ -350,39 +286,9 @@ export type UpdatedTrackSubscription = {
   providedIn: "root"
 })
 export class APIService {
-  async UpdateComplexity(key: string): Promise<UpdateComplexityMutation> {
-    const statement = `mutation UpdateComplexity($key: ID!) {
-        updateComplexity(key: $key) {
-          __typename
-          family {
-            __typename
-            genus {
-              __typename
-              name
-              species {
-                __typename
-                commonName
-                name
-              }
-            }
-            name
-          }
-          key
-          number
-          updatedAt
-        }
-      }`;
-    const gqlAPIServiceArguments: any = {
-      key
-    };
-    const response = (await API.graphql(
-      graphqlOperation(statement, gqlAPIServiceArguments)
-    )) as any;
-    return <UpdateComplexityMutation>response.data.updateComplexity;
-  }
-  async UpdateLocation(key: string): Promise<UpdateLocationMutation> {
-    const statement = `mutation UpdateLocation($key: ID!) {
-        updateLocation(key: $key) {
+  async UpdateLocation(input: LocationInput): Promise<UpdateLocationMutation> {
+    const statement = `mutation UpdateLocation($input: LocationInput!) {
+        updateLocation(input: $input) {
           __typename
           center
           city
@@ -408,16 +314,16 @@ export class APIService {
         }
       }`;
     const gqlAPIServiceArguments: any = {
-      key
+      input
     };
     const response = (await API.graphql(
       graphqlOperation(statement, gqlAPIServiceArguments)
     )) as any;
     return <UpdateLocationMutation>response.data.updateLocation;
   }
-  async UpdateSession(key: string): Promise<UpdateSessionMutation> {
-    const statement = `mutation UpdateSession($key: ID!) {
-        updateSession(key: $key) {
+  async UpdateSession(input: SessionInput): Promise<UpdateSessionMutation> {
+    const statement = `mutation UpdateSession($input: SessionInput!) {
+        updateSession(input: $input) {
           __typename
           date
           description
@@ -434,16 +340,16 @@ export class APIService {
         }
       }`;
     const gqlAPIServiceArguments: any = {
-      key
+      input
     };
     const response = (await API.graphql(
       graphqlOperation(statement, gqlAPIServiceArguments)
     )) as any;
     return <UpdateSessionMutation>response.data.updateSession;
   }
-  async UpdateSpeaker(key: string): Promise<UpdateSpeakerMutation> {
-    const statement = `mutation UpdateSpeaker($key: ID!) {
-        updateSpeaker(key: $key) {
+  async UpdateSpeaker(input: SpeakerInput): Promise<UpdateSpeakerMutation> {
+    const statement = `mutation UpdateSpeaker($input: SpeakerInput!) {
+        updateSpeaker(input: $input) {
           __typename
           about
           email
@@ -460,16 +366,16 @@ export class APIService {
         }
       }`;
     const gqlAPIServiceArguments: any = {
-      key
+      input
     };
     const response = (await API.graphql(
       graphqlOperation(statement, gqlAPIServiceArguments)
     )) as any;
     return <UpdateSpeakerMutation>response.data.updateSpeaker;
   }
-  async UpdateTrack(key: string): Promise<UpdateTrackMutation> {
-    const statement = `mutation UpdateTrack($key: ID!) {
-        updateTrack(key: $key) {
+  async UpdateTrack(input: TrackInput): Promise<UpdateTrackMutation> {
+    const statement = `mutation UpdateTrack($input: TrackInput!) {
+        updateTrack(input: $input) {
           __typename
           icon
           key
@@ -478,46 +384,15 @@ export class APIService {
         }
       }`;
     const gqlAPIServiceArguments: any = {
-      key
+      input
     };
     const response = (await API.graphql(
       graphqlOperation(statement, gqlAPIServiceArguments)
     )) as any;
     return <UpdateTrackMutation>response.data.updateTrack;
   }
-  async GetComplexity(key?: string): Promise<GetComplexityQuery> {
-    const statement = `query GetComplexity($key: ID) {
-        getComplexity(key: $key) {
-          __typename
-          family {
-            __typename
-            genus {
-              __typename
-              name
-              species {
-                __typename
-                commonName
-                name
-              }
-            }
-            name
-          }
-          key
-          number
-          updatedAt
-        }
-      }`;
-    const gqlAPIServiceArguments: any = {};
-    if (key) {
-      gqlAPIServiceArguments.key = key;
-    }
-    const response = (await API.graphql(
-      graphqlOperation(statement, gqlAPIServiceArguments)
-    )) as any;
-    return <GetComplexityQuery>response.data.getComplexity;
-  }
-  async GetLocation(key?: string): Promise<GetLocationQuery> {
-    const statement = `query GetLocation($key: ID) {
+  async GetLocation(key: string): Promise<GetLocationQuery> {
+    const statement = `query GetLocation($key: ID!) {
         getLocation(key: $key) {
           __typename
           center
@@ -543,17 +418,16 @@ export class APIService {
           }
         }
       }`;
-    const gqlAPIServiceArguments: any = {};
-    if (key) {
-      gqlAPIServiceArguments.key = key;
-    }
+    const gqlAPIServiceArguments: any = {
+      key
+    };
     const response = (await API.graphql(
       graphqlOperation(statement, gqlAPIServiceArguments)
     )) as any;
     return <GetLocationQuery>response.data.getLocation;
   }
-  async GetSession(key?: string): Promise<GetSessionQuery> {
-    const statement = `query GetSession($key: ID) {
+  async GetSession(key: string): Promise<GetSessionQuery> {
+    const statement = `query GetSession($key: ID!) {
         getSession(key: $key) {
           __typename
           date
@@ -570,17 +444,16 @@ export class APIService {
           updatedAt
         }
       }`;
-    const gqlAPIServiceArguments: any = {};
-    if (key) {
-      gqlAPIServiceArguments.key = key;
-    }
+    const gqlAPIServiceArguments: any = {
+      key
+    };
     const response = (await API.graphql(
       graphqlOperation(statement, gqlAPIServiceArguments)
     )) as any;
     return <GetSessionQuery>response.data.getSession;
   }
-  async GetSpeaker(key?: string): Promise<GetSpeakerQuery> {
-    const statement = `query GetSpeaker($key: ID) {
+  async GetSpeaker(key: string): Promise<GetSpeakerQuery> {
+    const statement = `query GetSpeaker($key: ID!) {
         getSpeaker(key: $key) {
           __typename
           about
@@ -597,17 +470,16 @@ export class APIService {
           updatedAt
         }
       }`;
-    const gqlAPIServiceArguments: any = {};
-    if (key) {
-      gqlAPIServiceArguments.key = key;
-    }
+    const gqlAPIServiceArguments: any = {
+      key
+    };
     const response = (await API.graphql(
       graphqlOperation(statement, gqlAPIServiceArguments)
     )) as any;
     return <GetSpeakerQuery>response.data.getSpeaker;
   }
-  async GetTrack(key?: string): Promise<GetTrackQuery> {
-    const statement = `query GetTrack($key: ID) {
+  async GetTrack(key: string): Promise<GetTrackQuery> {
+    const statement = `query GetTrack($key: ID!) {
         getTrack(key: $key) {
           __typename
           icon
@@ -616,39 +488,13 @@ export class APIService {
           updatedAt
         }
       }`;
-    const gqlAPIServiceArguments: any = {};
-    if (key) {
-      gqlAPIServiceArguments.key = key;
-    }
+    const gqlAPIServiceArguments: any = {
+      key
+    };
     const response = (await API.graphql(
       graphqlOperation(statement, gqlAPIServiceArguments)
     )) as any;
     return <GetTrackQuery>response.data.getTrack;
-  }
-  async ListComplexities(): Promise<Array<ListComplexitiesQuery>> {
-    const statement = `query ListComplexities {
-        listComplexities {
-          __typename
-          family {
-            __typename
-            genus {
-              __typename
-              name
-              species {
-                __typename
-                commonName
-                name
-              }
-            }
-            name
-          }
-          key
-          number
-          updatedAt
-        }
-      }`;
-    const response = (await API.graphql(graphqlOperation(statement))) as any;
-    return <Array<ListComplexitiesQuery>>response.data.listComplexities;
   }
   async ListLocations(): Promise<Array<ListLocationsQuery>> {
     const statement = `query ListLocations {
@@ -735,34 +581,6 @@ export class APIService {
     const response = (await API.graphql(graphqlOperation(statement))) as any;
     return <Array<ListTracksQuery>>response.data.listTracks;
   }
-  UpdatedComplexityListener: Observable<
-    UpdatedComplexitySubscription
-  > = API.graphql(
-    graphqlOperation(
-      `subscription UpdatedComplexity {
-        updatedComplexity {
-          __typename
-          family {
-            __typename
-            genus {
-              __typename
-              name
-              species {
-                __typename
-                commonName
-                name
-              }
-            }
-            name
-          }
-          key
-          number
-          updatedAt
-        }
-      }`
-    )
-  ) as Observable<UpdatedComplexitySubscription>;
-
   UpdatedLocationListener: Observable<
     UpdatedLocationSubscription
   > = API.graphql(

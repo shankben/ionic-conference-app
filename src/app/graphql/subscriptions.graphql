@@ -1,21 +1,4 @@
 # this is an auto generated file. This will be overwritten
-subscription UpdatedComplexity {
-  updatedComplexity {
-    family {
-      genus {
-        name
-        species {
-          commonName
-          name
-        }
-      }
-      name
-    }
-    key
-    number
-    updatedAt
-  }
-}
 subscription UpdatedLocation {
   updatedLocation {
     center

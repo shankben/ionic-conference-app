@@ -1,23 +1,6 @@
 # this is an auto generated file. This will be overwritten
-mutation UpdateComplexity($key: ID!) {
-  updateComplexity(key: $key) {
-    family {
-      genus {
-        name
-        species {
-          commonName
-          name
-        }
-      }
-      name
-    }
-    key
-    number
-    updatedAt
-  }
-}
-mutation UpdateLocation($key: ID!) {
-  updateLocation(key: $key) {
+mutation UpdateLocation($input: LocationInput!) {
+  updateLocation(input: $input) {
     center
     city
     key
@@ -40,8 +23,8 @@ mutation UpdateLocation($key: ID!) {
     }
   }
 }
-mutation UpdateSession($key: ID!) {
-  updateSession(key: $key) {
+mutation UpdateSession($input: SessionInput!) {
+  updateSession(input: $input) {
     date
     description
     groupId
@@ -56,8 +39,8 @@ mutation UpdateSession($key: ID!) {
     updatedAt
   }
 }
-mutation UpdateSpeaker($key: ID!) {
-  updateSpeaker(key: $key) {
+mutation UpdateSpeaker($input: SpeakerInput!) {
+  updateSpeaker(input: $input) {
     about
     email
     id
@@ -72,8 +55,8 @@ mutation UpdateSpeaker($key: ID!) {
     updatedAt
   }
 }
-mutation UpdateTrack($key: ID!) {
-  updateTrack(key: $key) {
+mutation UpdateTrack($input: TrackInput!) {
+  updateTrack(input: $input) {
     icon
     key
     name

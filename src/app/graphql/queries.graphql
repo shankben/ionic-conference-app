@@ -1,22 +1,5 @@
 # this is an auto generated file. This will be overwritten
-query GetComplexity($key: ID) {
-  getComplexity(key: $key) {
-    family {
-      genus {
-        name
-        species {
-          commonName
-          name
-        }
-      }
-      name
-    }
-    key
-    number
-    updatedAt
-  }
-}
-query GetLocation($key: ID) {
+query GetLocation($key: ID!) {
   getLocation(key: $key) {
     center
     city
@@ -40,7 +23,7 @@ query GetLocation($key: ID) {
     }
   }
 }
-query GetSession($key: ID) {
+query GetSession($key: ID!) {
   getSession(key: $key) {
     date
     description
@@ -56,7 +39,7 @@ query GetSession($key: ID) {
     updatedAt
   }
 }
-query GetSpeaker($key: ID) {
+query GetSpeaker($key: ID!) {
   getSpeaker(key: $key) {
     about
     email
@@ -72,28 +55,11 @@ query GetSpeaker($key: ID) {
     updatedAt
   }
 }
-query GetTrack($key: ID) {
+query GetTrack($key: ID!) {
   getTrack(key: $key) {
     icon
     key
     name
-    updatedAt
-  }
-}
-query ListComplexities {
-  listComplexities {
-    family {
-      genus {
-        name
-        species {
-          commonName
-          name
-        }
-      }
-      name
-    }
-    key
-    number
     updatedAt
   }
 }

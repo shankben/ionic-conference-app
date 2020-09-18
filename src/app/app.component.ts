@@ -16,6 +16,8 @@ import { SwUpdate } from '@angular/service-worker';
 
 import { Hub } from 'aws-amplify';
 
+import { Subscription } from 'rxjs';
+
 import { User } from './interfaces/user';
 import { UserData } from './providers/user-data';
 import { ConferenceData } from './providers/conference-data';
@@ -48,10 +50,9 @@ export class AppComponent implements OnInit, AfterViewInit {
     window.addEventListener('user:signin', updateUserStatus);
     window.addEventListener('user:signup', updateUserStatus);
     window.addEventListener('user:signout', () => this.signedIn = false);
-
-    Hub.listen(/.*/, (data) => {
-      console.log('Listening for all messages: ', data.payload.data);
-    });
+    // Hub.listen(/.*/, (data) => {
+    //   console.log('Listening for all messages: ', data.payload.data);
+    // });
   }
 
   constructor(
@@ -72,21 +73,22 @@ export class AppComponent implements OnInit, AfterViewInit {
 
   private loadData() {
     this.userData.user().then((res) => this.user = res);
-    this.conferenceData.getLocations().subscribe((locations: any) => {
-      const center = locations.find((it: any) => it.center);
-      if (!center) {
-        return;
-      }
-      this.weather = center.weather;
-      this.weather.updatedAt = 'Updated ' + new Intl.DateTimeFormat('en', {
-        year: 'numeric',
-        month: 'short',
-        day: '2-digit',
-        hour: 'numeric',
-        hour12: true,
-        minute: 'numeric'
-      }).format(new Date(this.weather.updatedAt));
-    });
+    this.conferenceData.getLocations()
+      .subscribe((locations: any) => {
+        const center = locations.find((it: any) => it.center);
+        if (!center) {
+          return;
+        }
+        this.weather = center.weather;
+        this.weather.updatedAt = 'Updated ' + new Intl.DateTimeFormat('en', {
+          year: 'numeric',
+          month: 'short',
+          day: '2-digit',
+          hour: 'numeric',
+          hour12: true,
+          minute: 'numeric'
+        }).format(new Date(this.weather.updatedAt));
+      });
   }
 
   private async initializeApp() {
@@ -97,7 +99,6 @@ export class AppComponent implements OnInit, AfterViewInit {
   }
 
   async ngOnInit() {
-    this.loadData();
     this.listenForSignInEvents();
     this.swUpdate.available.subscribe(async () => {
       const toast = await this.toastCtrl.create({
@@ -117,17 +118,17 @@ export class AppComponent implements OnInit, AfterViewInit {
     const appEl = this.doc.querySelector('ion-app');
     const observer = new MutationObserver((mutations) => {
       mutations.forEach((mutation) => {
-        if (mutation.attributeName === 'class') {
-          const el = mutation.target as HTMLElement;
-          const isDark = el.classList.contains('dark-theme');
-          window.dispatchEvent(new CustomEvent('themeChanged', {
-            detail: { isDark }
-          }));
-          this.loadData();
+        if (mutation.attributeName !== 'class') {
+          return;
         }
+        const el = mutation.target as HTMLElement;
+        const isDark = el.classList.contains('dark-theme');
+        window.dispatchEvent(new CustomEvent('themeChanged', {
+          detail: { isDark }
+        }));
+        this.loadData();
       });
     });
-
     observer.observe(appEl, {
       attributes: true
     });

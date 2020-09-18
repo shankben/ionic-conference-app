@@ -27,7 +27,7 @@ export class SignupPage {
     this.submitted = true;
     if (form.valid) {
       try {
-        await this.userData.signup(this.userOptions);
+        await this.userData.signUp(this.userOptions);
         this.router.navigateByUrl('/confirm-signup');
       } catch (err) {
         // OK

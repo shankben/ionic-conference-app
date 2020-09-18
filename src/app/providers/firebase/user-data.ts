@@ -73,7 +73,7 @@ export class FirebaseUserData {
     window.dispatchEvent(new CustomEvent('user:signout'));
   }
 
-  async signup(userOptions: UserOptions): Promise<any> {
+  async signUp(userOptions: UserOptions): Promise<any> {
     const { username, email, password } = userOptions;
     try {
       await firebase.auth().createUserWithEmailAndPassword(email, password);

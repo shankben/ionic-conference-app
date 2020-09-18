@@ -45,8 +45,8 @@ export class UserData {
     return this.provider.signOut();
   }
 
-  async signup(userOptions: UserOptions): Promise<any> {
-    return this.provider.signup(userOptions);
+  async signUp(userOptions: UserOptions): Promise<any> {
+    return this.provider.signUp(userOptions);
   }
 
   async confirmSignup(username: string, code: string): Promise<any> {

@@ -93,7 +93,7 @@ export class AmplifyUserData {
     }
   }
 
-  async signup(userOptions: UserOptions): Promise<any> {
+  async signUp(userOptions: UserOptions): Promise<any> {
     const { username, email, password } = userOptions;
     try {
       await Auth.signUp({

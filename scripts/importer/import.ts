@@ -1,13 +1,8 @@
 import * as admin from 'firebase-admin';
+import firebaseAppConfig from '../../secrets/firebase-app-config';
 
-const serviceAccount = require('../../secrets/service-account-key.json');
 const data = require('./data.json');
-
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
-  databaseURL: 'https://ionic-conference-demo.firebaseio.com'
-});
-
+admin.initializeApp(firebaseAppConfig);
 const db = admin.firestore();
 
 async function main() {
@@ -22,7 +17,6 @@ async function main() {
       console.log('Added', it);
     });
   });
-
 }
 
 main().catch(console.error);

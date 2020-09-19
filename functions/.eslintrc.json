@@ -7,6 +7,7 @@
   ],
   "extends": "eslint:recommended",
   "rules": {
+    "consistent-return": "off",
     "no-console": "off",
     "no-regex-spaces": "off",
     "no-debugger": "off",
@@ -14,7 +15,6 @@
     "no-mixed-spaces-and-tabs": "off",
     "no-undef": "off",
     "no-template-curly-in-string": 1,
-    "consistent-return": 1,
     "array-callback-return": 1,
     "eqeqeq": 2,
     "no-alert": 2,

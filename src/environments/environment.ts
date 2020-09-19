@@ -3,7 +3,7 @@ import amplifyConfig from '../../secrets/amplify-config';
 
 export const environment = {
   production: false,
-  provider: 'amplify',
+  provider: 'firebase',
   firebase: firebaseAppConfig,
   amplify: amplifyConfig
 };

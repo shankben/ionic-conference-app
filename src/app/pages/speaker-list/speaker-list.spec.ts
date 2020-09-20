@@ -5,7 +5,7 @@ import { ActionSheetController } from '@ionic/angular';
 
 import { InAppBrowser } from '@ionic-native/in-app-browser/ngx';
 import { SpeakerListPage } from './speaker-list';
-import { ConferenceData } from '../../providers/conference-data';
+import Repository from '../../repository';
 
 const confDataSub = {};
 
@@ -25,7 +25,7 @@ describe('SpeakerListPage', () => {
         { provide: ActionSheetController, useValue: actionSheetSpy },
         { provide: InAppBrowser, useValue: iabSpy },
         { provide: Router, useValue: routerSpy },
-        { provide: ConferenceData, useValue: confDataSub }
+        { provide: Repository, useValue: confDataSub }
       ]
     }).compileComponents();
   }));

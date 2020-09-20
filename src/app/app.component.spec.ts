@@ -20,7 +20,7 @@ import { SplashScreen } from '@ionic-native/splash-screen/ngx';
 import { StatusBar } from '@ionic-native/status-bar/ngx';
 import { IonicStorageModule } from '@ionic/storage';
 import { AppComponent } from './app.component';
-import { UserData } from './providers/user-data';
+import Repository from './repository';
 
 describe('AppComponent', () => {
   let menuSpy,
@@ -63,7 +63,7 @@ describe('AppComponent', () => {
       providers: [
         { provide: MenuController, useValue: menuSpy },
         { provide: Router, useValue: routerSpy },
-        { provide: UserData, useValue: userDataSpy },
+        { provide: Repository, useValue: userDataSpy },
         { provide: StatusBar, useValue: statusBarSpy },
         { provide: SplashScreen, useValue: splashScreenSpy },
         { provide: SwUpdate, useValue: swUpdateSpy },

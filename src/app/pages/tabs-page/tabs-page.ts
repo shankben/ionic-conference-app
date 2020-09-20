@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { UserData } from '../../providers/user-data';
+import Repository from '../../repository';
 
 @Component({
   templateUrl: 'tabs-page.html',
@@ -10,11 +10,11 @@ export class TabsPage {
   user: any;
 
   private setUser() {
-    this.userData.user().then((user) => this.user = user);
-    this.userData.isSignedIn().then((val) => this.signedIn = val);
+    this.repository.user().then((user) => this.user = user);
+    this.repository.isSignedIn().then((val) => this.signedIn = val);
   }
 
-  constructor(public userData: UserData) {
+  constructor(public repository: Repository) {
     this.setUser();
     window.addEventListener('user:signin', () => this.setUser());
   }

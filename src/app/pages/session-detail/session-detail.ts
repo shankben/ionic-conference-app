@@ -1,8 +1,7 @@
 import { Component } from '@angular/core';
 
-import { ConferenceData } from '../../providers/conference-data';
 import { ActivatedRoute } from '@angular/router';
-import { UserData } from '../../providers/user-data';
+import Repository from '../../repository';
 
 @Component({
   selector: 'page-session-detail',
@@ -15,16 +14,15 @@ export class SessionDetailPage {
   defaultHref = '';
 
   constructor(
-    private conferenceData: ConferenceData,
-    private userProvider: UserData,
+    private repository: Repository,
     private route: ActivatedRoute
   ) { }
 
   ionViewWillEnter() {
     const sessionId = this.route.snapshot.paramMap.get('sessionId');
-    this.conferenceData.getSessionById(sessionId).subscribe((it) => {
+    this.repository.sessionById(sessionId).subscribe((it) => {
       this.session = Array.isArray(it) ? it.shift() : it;
-      this.isFavorite = this.userProvider.hasFavorite(this.session.name);
+      this.isFavorite = this.repository.hasFavorite(this.session.name);
     });
   }
 
@@ -37,11 +35,11 @@ export class SessionDetailPage {
   }
 
   toggleFavorite() {
-    if (this.userProvider.hasFavorite(this.session.name)) {
-      this.userProvider.removeFavorite(this.session.name);
+    if (this.repository.hasFavorite(this.session.name)) {
+      this.repository.removeFavorite(this.session.name);
       this.isFavorite = false;
     } else {
-      this.userProvider.addFavorite(this.session.name);
+      this.repository.addFavorite(this.session.name);
       this.isFavorite = true;
     }
   }

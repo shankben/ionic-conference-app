@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { ConferenceData } from '../../providers/conference-data';
+import Repository from '../../repository';
 
 @Component({
   selector: 'page-speaker-list',
@@ -10,11 +10,11 @@ export class SpeakerListPage {
   speakers: any[] = [];
 
   private load() {
-    this.conferenceData.getSpeakers()
+    this.repository.listSpeakers()
       .subscribe((speakers: any[]) => this.speakers = speakers);
   }
 
-  constructor(public conferenceData: ConferenceData) {
+  constructor(public repository: Repository) {
     window.addEventListener('themeChanged', () => this.load());
   }
 

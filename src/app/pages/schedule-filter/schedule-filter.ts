@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { Config, ModalController, NavParams } from '@ionic/angular';
 
-import { ConferenceData } from '../../providers/conference-data';
+import Repository from '../../repository';
 
 
 @Component({
@@ -15,7 +15,7 @@ export class ScheduleFilterPage {
   tracks: {name: string, icon: string, isChecked: boolean}[] = [];
 
   constructor(
-    public conferenceData: ConferenceData,
+    public repository: Repository,
     private config: Config,
     public modalCtrl: ModalController,
     public navParams: NavParams
@@ -26,7 +26,7 @@ export class ScheduleFilterPage {
 
     const excludedTrackNames = this.navParams.get('excludedTracks');
 
-    this.conferenceData.getTracks().subscribe((tracks: any[]) => {
+    this.repository.listTracks().subscribe((tracks: any[]) => {
       tracks.forEach((track) => this.tracks.push({
         ...track,
         isChecked: (excludedTrackNames.indexOf(track.name) === -1)

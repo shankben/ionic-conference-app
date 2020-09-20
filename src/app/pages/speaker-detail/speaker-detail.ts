@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { ConferenceData } from '../../providers/conference-data';
+import Repository from '../../repository';
 import { ActionSheetController } from '@ionic/angular';
 import { InAppBrowser } from '@ionic-native/in-app-browser/ngx';
 
@@ -15,13 +15,13 @@ export class SpeakerDetailPage {
   constructor(
     private route: ActivatedRoute,
     public actionSheetCtrl: ActionSheetController,
-    public conferenceData: ConferenceData,
+    public repository: Repository,
     public inAppBrowser: InAppBrowser,
   ) { }
 
   ionViewWillEnter() {
     const speakerId = this.route.snapshot.paramMap.get('speakerId');
-    this.conferenceData.getSpeakerById(speakerId)
+    this.repository.speakerById(speakerId)
       .subscribe((it) => {
         console.log({ speaker: it });
         this.speaker = Array.isArray(it) ? it.shift() : it;

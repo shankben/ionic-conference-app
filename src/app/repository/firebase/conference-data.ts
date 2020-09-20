@@ -7,36 +7,36 @@ import { map } from 'rxjs/operators';
 export class FirebaseConferenceData {
   constructor(private readonly afs: AngularFirestore) { }
 
-  getSessionById(sessionId: string): Observable<any> {
+  sessionById(sessionId: string): Observable<any> {
     return this.afs
       .collection('sessions', (ref) => ref.limit(1)
         .where('id', '==', sessionId))
       .valueChanges();
   }
 
-  getSessions(): Observable<any> {
+  listSessions(): Observable<any> {
     return this.afs.collection('sessions').get()
       .pipe(map(({ docs }) => docs.map((it) => it.data())));
   }
 
-  getSpeakerById(speakerId: string): Observable<any> {
+  speakerById(speakerId: string): Observable<any> {
     return this.afs
       .collection('speakers', (ref) => ref.limit(1)
         .where('id', '==', speakerId))
       .valueChanges();
   }
 
-  getSpeakers(): Observable<any> {
+  listSpeakers(): Observable<any> {
     return this.afs
       .collection('speakers', (ref) => ref.orderBy('name'))
       .valueChanges();
   }
 
-  getTracks(): Observable<any> {
+  listTracks(): Observable<any> {
     return this.afs.collection('tracks').valueChanges();
   }
 
-  getLocations(): Observable<any> {
+  listLocations(): Observable<any> {
     return this.afs.collection('locations').valueChanges();
   }
 }

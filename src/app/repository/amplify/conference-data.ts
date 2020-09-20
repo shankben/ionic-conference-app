@@ -67,29 +67,29 @@ export class AmplifyConferenceData {
     });
   }
 
-  getSessionById(sessionId: string): Observable<GetSessionQuery> {
+  sessionById(sessionId: string): Observable<GetSessionQuery> {
     return from(this.appSyncService.GetSession(sessionId)).pipe(this.keyToId());
   }
 
-  getSessions(): Observable<ListSessionsQuery[]> {
+  listSessions(): Observable<ListSessionsQuery[]> {
     return from(this.appSyncService.ListSessions()).pipe(this.keysToIds());
   }
 
-  getSpeakerById(speakerId: string): Observable<GetSpeakerQuery> {
+  speakerById(speakerId: string): Observable<GetSpeakerQuery> {
     return from(this.appSyncService.GetSpeaker(speakerId)).pipe(this.keyToId());
   }
 
-  getSpeakers(): Observable<ListSpeakersQuery[]> {
+  listSpeakers(): Observable<ListSpeakersQuery[]> {
     return from(this.appSyncService.ListSpeakers())
       .pipe(this.keysToIds())
       .pipe(this.sortByName());
   }
 
-  getTracks(): Observable<ListTracksQuery[]> {
+  listTracks(): Observable<ListTracksQuery[]> {
     return from(this.appSyncService.ListTracks());
   }
 
-  getLocations(): Observable<ListLocationsQuery[]> {
+  listLocations(): Observable<ListLocationsQuery[]> {
     try {
       this.locationsSubscription.unsubscribe();
     } catch (err) {

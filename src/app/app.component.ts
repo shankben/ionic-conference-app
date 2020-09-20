@@ -14,13 +14,14 @@ import { DOCUMENT} from '@angular/common';
 import { Router } from '@angular/router';
 import { SwUpdate } from '@angular/service-worker';
 
-import { Hub } from 'aws-amplify';
-
-import { Subscription } from 'rxjs';
+// import { Hub } from 'aws-amplify';
+// import { Subscription } from 'rxjs';
 
 import { User } from './interfaces/user';
-import { UserData } from './providers/user-data';
-import { ConferenceData } from './providers/conference-data';
+// import { UserData } from './repository/user-data';
+// import { ConferenceData } from './repository/conference-data';
+import Repository from './repository';
+
 import { environment } from '../environments/environment';
 
 @Component({
@@ -45,7 +46,7 @@ export class AppComponent implements OnInit, AfterViewInit {
   private listenForSignInEvents() {
     const updateUserStatus = () => {
       this.signedIn = true;
-      this.userData.user().then((user) => this.user = user);
+      this.repository.user().then((user) => this.user = user);
     };
     window.addEventListener('user:signin', updateUserStatus);
     window.addEventListener('user:signup', updateUserStatus);
@@ -63,8 +64,7 @@ export class AppComponent implements OnInit, AfterViewInit {
     private splashScreen: SplashScreen,
     private statusBar: StatusBar,
     private storage: Storage,
-    private userData: UserData,
-    private conferenceData: ConferenceData,
+    private repository: Repository,
     private swUpdate: SwUpdate,
     private toastCtrl: ToastController,
   ) {
@@ -72,8 +72,8 @@ export class AppComponent implements OnInit, AfterViewInit {
   }
 
   private loadData() {
-    this.userData.user().then((res) => this.user = res);
-    this.conferenceData.getLocations()
+    this.repository.user().then((res) => this.user = res);
+    this.repository.listLocations()
       .subscribe((locations: any) => {
         const center = locations.find((it: any) => it.center);
         if (!center) {
@@ -135,11 +135,11 @@ export class AppComponent implements OnInit, AfterViewInit {
   }
 
   async checkSignInStatus() {
-    this.signedIn = await this.userData.isSignedIn();
+    this.signedIn = await this.repository.isSignedIn();
   }
 
   async signOut() {
-    await this.userData.signOut();
+    await this.repository.signOut();
     return this.router.navigateByUrl('/app/tabs/schedule');
   }
 

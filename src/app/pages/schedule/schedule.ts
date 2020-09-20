@@ -12,8 +12,8 @@ import {
 } from '@ionic/angular';
 
 import { ScheduleFilterPage } from '../schedule-filter/schedule-filter';
-import { ConferenceData } from '../../providers/conference-data';
-import { UserData } from '../../providers/user-data';
+
+import Repository from '../../repository';
 
 @Component({
   selector: 'page-schedule',
@@ -34,7 +34,6 @@ export class SchedulePage implements OnInit {
   showSearchbar: boolean;
 
   constructor(
-    public conferenceData: ConferenceData,
     public config: Config,
     public alertController: AlertController,
     public loadingController: LoadingController,
@@ -42,7 +41,7 @@ export class SchedulePage implements OnInit {
     public toastController: ToastController,
     public router: Router,
     public routerOutlet: IonRouterOutlet,
-    public user: UserData
+    public repository: Repository
   ) {
     window.addEventListener('themeChanged', () => this.updateSchedule());
   }
@@ -56,7 +55,7 @@ export class SchedulePage implements OnInit {
     if (this.scheduleList) {
       this.scheduleList.closeSlidingItems();
     }
-    this.conferenceData.getSessions(
+    this.repository.listSessions(
       this.dayIndex,
       this.queryText,
       this.excludeTracks,
@@ -84,10 +83,10 @@ export class SchedulePage implements OnInit {
   }
 
   async addFavorite(slidingItem: HTMLIonItemSlidingElement, sessionData: any) {
-    if (this.user.hasFavorite(sessionData.name)) {
+    if (this.repository.hasFavorite(sessionData.name)) {
       this.removeFavorite(slidingItem, sessionData, 'Favorite already added');
     } else {
-      this.user.addFavorite(sessionData.name);
+      this.repository.addFavorite(sessionData.name);
       slidingItem.close();
       const toast = await this.toastController.create({
         header: `${sessionData.name} was successfully added as a favorite.`,
@@ -117,7 +116,7 @@ export class SchedulePage implements OnInit {
         {
           text: 'Remove',
           handler: () => {
-            this.user.removeFavorite(sessionData.name);
+            this.repository.removeFavorite(sessionData.name);
             this.updateSchedule();
             slidingItem.close();
           }

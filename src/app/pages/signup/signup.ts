@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
-import { UserData } from '../../providers/user-data';
+import Repository from '../../repository';
 import { UserOptions } from '../../interfaces/user-options';
 
 @Component({
@@ -20,14 +20,14 @@ export class SignupPage {
 
   constructor(
     public router: Router,
-    public userData: UserData
+    public repository: Repository
   ) { }
 
   async onSignup(form: NgForm) {
     this.submitted = true;
     if (form.valid) {
       try {
-        await this.userData.signUp(this.userOptions);
+        await this.repository.signUp(this.userOptions);
         this.router.navigateByUrl('/confirm-signup');
       } catch (err) {
         // OK

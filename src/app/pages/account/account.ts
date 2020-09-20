@@ -1,7 +1,7 @@
 import { AlertController } from '@ionic/angular';
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { UserData } from '../../providers/user-data';
+import Repository from '../../repository';
 
 @Component({
   selector: 'page-account',
@@ -12,13 +12,13 @@ export class AccountPage {
   user: any;
 
   private setUser() {
-    this.userData.user().then((user) => this.user = user);
+    this.repository.user().then((user) => this.user = user);
   }
 
   constructor(
     public alertCtrl: AlertController,
     public router: Router,
-    public userData: UserData
+    public repository: Repository
   ) {
     this.setUser();
     window.addEventListener('user:signin', () => this.setUser());
@@ -27,7 +27,7 @@ export class AccountPage {
   async profilePictureChange(ev: Event) {
     const fileInput = ev.target as HTMLInputElement;
     const file = Array.from(fileInput.files).pop();
-    await this.userData.updateUser({ profilePicture: file });
+    await this.repository.updateUser({ profilePicture: file });
   }
 
   async changeUsername() {
@@ -37,9 +37,9 @@ export class AccountPage {
         'Cancel',
         {
           text: 'OK',
-          handler: ({ username }: any) => this.userData
+          handler: ({ username }: any) => this.repository
             .updateUser({ displayName: username })
-            .then(() => this.userData.user().then((user) => this.user = user))
+            .then(() => this.repository.user().then((user) => this.user = user))
             .catch(console.error)
         }
       ],
@@ -60,7 +60,7 @@ export class AccountPage {
   }
 
   signOut() {
-    this.userData.signOut();
+    this.repository.signOut();
     this.router.navigateByUrl('/signin');
   }
 }

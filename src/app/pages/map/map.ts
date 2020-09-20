@@ -10,7 +10,7 @@ import {
 
 import { DOCUMENT} from '@angular/common';
 
-import { ConferenceData } from '../../providers/conference-data';
+import Repository from '../../repository';
 import darkStyle from './map-dark-style';
 
 import firebaseAppConfig from '../../../../secrets/firebase-app-config';
@@ -25,7 +25,7 @@ export class MapPage implements AfterViewInit {
 
   constructor(
     @Inject(DOCUMENT) private doc: Document,
-    public conferenceData: ConferenceData,
+    public repository: Repository,
     public platform: Platform
   ) { }
 
@@ -62,7 +62,7 @@ export class MapPage implements AfterViewInit {
 
     let map: any;
 
-    this.conferenceData.getLocations().subscribe((locations: any) => {
+    this.repository.listLocations().subscribe((locations: any) => {
       const mapEle = this.mapElement.nativeElement;
 
       map = new googleMaps.Map(mapEle, {

@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
 
-import { UserData } from '../../providers/user-data';
+import Repository from '../../repository';
 import { UserOptions } from '../../interfaces/user-options';
 
 @Component({
@@ -20,7 +20,7 @@ export class SignInPage {
   submitted = false;
 
   constructor(
-    public userData: UserData,
+    public repository: Repository,
     public router: Router
   ) {
     window.addEventListener('user:signin', () => {
@@ -31,7 +31,7 @@ export class SignInPage {
   onSignIn(form: NgForm) {
     this.submitted = true;
     if (form.valid) {
-      this.userData.signIn(this.userOptions);
+      this.repository.signIn(this.userOptions);
     }
   }
 

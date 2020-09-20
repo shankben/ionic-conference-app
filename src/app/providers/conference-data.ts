@@ -50,9 +50,9 @@ export class ConferenceData {
   }
 
   constructor(
-    private readonly userData: UserData,
-    private readonly amplifyProvider: AmplifyConferenceData,
-    private readonly firebaseProvider: FirebaseConferenceData
+    amplifyProvider: AmplifyConferenceData,
+    firebaseProvider: FirebaseConferenceData,
+    private readonly userData: UserData
   ) {
     this.provider = amplifyProvider;
     window.addEventListener(

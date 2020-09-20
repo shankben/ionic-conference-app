@@ -20,10 +20,6 @@ import {
   UpdatedLocationSubscription
 } from './API.service';
 
-interface Session extends ListSessionsQuery {
-  hide?: boolean;
-}
-
 interface KeyIdLike {
   key: string;
   id: string;
@@ -33,7 +29,7 @@ interface NameLike {
   name: string;
 }
 
-interface ZenSubscription {
+interface Unsubscribable {
   unsubscribe(): void;
 }
 
@@ -41,7 +37,7 @@ interface ZenSubscription {
 @Injectable({ providedIn: 'root' })
 export class AmplifyConferenceData {
 
-  private sub: ZenSubscription;
+  private locationsSubscription: Unsubscribable;
 
   private oneKeyToId<T>(item: KeyIdLike): T {
     item.id = item.key;
@@ -65,25 +61,22 @@ export class AmplifyConferenceData {
 
   constructor(private readonly appSyncService: APIService) {
     window.addEventListener('themeChanged', (ev: CustomEvent) => {
-      if (ev.detail.isDark && this.sub) {
-        this.sub.unsubscribe();
+      if (ev.detail.isDark && this.locationsSubscription) {
+        this.locationsSubscription.unsubscribe();
       }
     });
   }
 
   getSessionById(sessionId: string): Observable<GetSessionQuery> {
-    return from(this.appSyncService.GetSession(sessionId))
-      .pipe(this.keyToId());
+    return from(this.appSyncService.GetSession(sessionId)).pipe(this.keyToId());
   }
 
   getSessions(): Observable<ListSessionsQuery[]> {
-    return from(this.appSyncService.ListSessions())
-      .pipe(this.keysToIds());
+    return from(this.appSyncService.ListSessions()).pipe(this.keysToIds());
   }
 
   getSpeakerById(speakerId: string): Observable<GetSpeakerQuery> {
-    return from(this.appSyncService.GetSpeaker(speakerId))
-      .pipe(this.keyToId());
+    return from(this.appSyncService.GetSpeaker(speakerId)).pipe(this.keyToId());
   }
 
   getSpeakers(): Observable<ListSpeakersQuery[]> {
@@ -98,15 +91,15 @@ export class AmplifyConferenceData {
 
   getLocations(): Observable<ListLocationsQuery[]> {
     try {
-      this.sub.unsubscribe();
+      this.locationsSubscription.unsubscribe();
     } catch (err) {
       // OK: Always unconditionally unsubscribe
     }
     const obs = Observable
       .create((observer: Observer<UpdatedLocationSubscription[]>) => {
-        this.sub = this.appSyncService.UpdatedLocationListener
+        this.locationsSubscription = this.appSyncService.UpdatedLocationListener
           .subscribe((res: any) => observer
-            .next([res.value.data.updatedLocation])) as ZenSubscription;
+            .next([res.value.data.updatedLocation]));
       });
     const ls = from(this.appSyncService.ListLocations());
     return merge(ls, obs);

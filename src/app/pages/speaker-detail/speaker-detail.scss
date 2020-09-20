@@ -21,18 +21,12 @@ ion-toolbar ion-menu-button {
 
 .speaker-background {
   position: relative;
-
   display: flex;
-
   padding-top: var(--ion-safe-area-top);
-
   align-items: center;
   justify-content: center;
-
   flex-direction: column;
-
   height: calc(250px + var(--ion-safe-area-top));
-
   background: center / cover url(/assets/img/speaker-background.png) no-repeat;
 }
 
@@ -44,9 +38,7 @@ ion-toolbar ion-menu-button {
 
 .speaker-background h2 {
   position: absolute;
-
   bottom: 10px;
-
   color: white;
 }
 

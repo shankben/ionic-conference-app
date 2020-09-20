@@ -1,12 +1,27 @@
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { Injectable } from '@angular/core';
+
 import { UserOptions, UserUpdate } from '../interfaces/user-options';
 import { User } from '../interfaces/user';
+import { Session } from '../interfaces/session';
+
 import { AmplifyUserData } from './amplify/user-data';
 import { AmplifyConferenceData } from './amplify/conference-data';
 import { FirebaseUserData } from './firebase/user-data';
 import { FirebaseConferenceData } from './firebase/conference-data';
+
+
+interface SessionGroupItem {
+  time?: string;
+  hide: boolean;
+  sessions: Session[];
+}
+
+interface SessionGroup {
+  shownSessions: number;
+  groups: SessionGroupItem[];
+}
 
 
 @Injectable({ providedIn: 'root' })
@@ -53,14 +68,14 @@ export default class Repository {
   }
 
   private groupSessions(
-    sessions: any[],
+    sessions: Session[],
     dayIndex: number,
     queryText = '',
     excludeTracks: any[] = [],
     segment = 'all'
-  ): {[k: string]: any} {
+  ): SessionGroup {
     const queryWords = queryText.split(' ').filter((it) => !!it.trim().length);
-    const groups = new Map();
+    const groups = new Map<string, SessionGroupItem>();
     let shownSessions = 0;
     sessions
       .sort((x, y) => x.groupId <= y.groupId ? -1 : 1)
@@ -150,7 +165,7 @@ export default class Repository {
   }
 
   //// Sessions
-  sessionById(sessionId: string): Observable<any> {
+  sessionById(sessionId: string): Observable<Session> {
     return this.sessions.sessionById(sessionId);
   }
 
@@ -159,7 +174,7 @@ export default class Repository {
     queryText = '',
     excludeTracks: any[] = [],
     segment = 'all'
-  ): Observable<any> {
+  ): Observable<SessionGroup> {
     return this.sessions.listSessions().pipe(map((sessions) =>
       this.groupSessions(
         sessions,

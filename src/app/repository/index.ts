@@ -1,89 +1,19 @@
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-
 import { Injectable } from '@angular/core';
-import { Storage } from '@ionic/storage';
-
 import { UserOptions, UserUpdate } from '../interfaces/user-options';
 import { User } from '../interfaces/user';
-
 import { AmplifyUserData } from './amplify/user-data';
 import { AmplifyConferenceData } from './amplify/conference-data';
-
 import { FirebaseUserData } from './firebase/user-data';
 import { FirebaseConferenceData } from './firebase/conference-data';
 
 
 @Injectable({ providedIn: 'root' })
 export default class Repository {
-  private favorites: string[] = [];
-
   private users: AmplifyUserData | FirebaseUserData;
   private sessions: AmplifyConferenceData | FirebaseConferenceData;
-
-  data: any;
-
-  constructor(
-    amplifyUsers: AmplifyUserData,
-    amplifySessions: AmplifyConferenceData,
-    firebaseUsers: FirebaseUserData,
-    firebaseSessions: FirebaseConferenceData,
-    private readonly storage: Storage
-  ) {
-    this.users = firebaseUsers;
-    this.sessions = firebaseSessions;
-    window.addEventListener('themeChanged', (ev: CustomEvent) => {
-      this.users = !ev.detail.isDark ? amplifyUsers : firebaseUsers;
-      this.sessions = !ev.detail.isDark ? amplifySessions : firebaseSessions;
-    });
-  }
-
-  async checkHasSeenTutorial(): Promise<string> {
-    return this.storage.get('hasSeenTutorial');
-  }
-
-  async user(): Promise<User> {
-    return await this.users.user();
-  }
-
-  async updateUser(userOptions: UserUpdate): Promise<any> {
-    return this.users.updateUser(userOptions);
-  }
-
-  async signIn(userOptions: UserOptions): Promise<any> {
-    return this.users.signIn(userOptions);
-  }
-
-  async signOut(): Promise<any> {
-    return this.users.signOut();
-  }
-
-  async signUp(userOptions: UserOptions): Promise<any> {
-    return this.users.signUp(userOptions);
-  }
-
-  async confirmSignup(username: string, code: string): Promise<any> {
-    return this.users.confirmSignup(username, code);
-  }
-
-  async isSignedIn(): Promise<boolean> {
-    return await this.users.isSignedIn();
-  }
-
-  hasFavorite(sessionName: string): boolean {
-    return (this.favorites.indexOf(sessionName) > -1);
-  }
-
-  addFavorite(sessionName: string): void {
-    this.favorites.push(sessionName);
-  }
-
-  removeFavorite(sessionName: string): void {
-    const index = this.favorites.indexOf(sessionName);
-    if (index > -1) {
-      this.favorites.splice(index, 1);
-    }
-  }
+  private favorites: Set<string> = new Set();
 
   private filterSession(
     session: any,
@@ -155,14 +85,71 @@ export default class Repository {
 
     return {
       shownSessions,
-      groups: Array.from(groups.values()).map((group) => {
-        group.sessions = group.sessions
-          .sort((x, y) => x.timeStart <= y.timeStart ? -1 : 1);
-        return group;
-      })
+      groups: Array.from(groups.values()).map((group) => ({
+        ...group,
+        sessions: group.sessions
+          .sort((x, y) => x.timeStart <= y.timeStart ? -1 : 1)
+      }))
     };
   }
 
+  constructor(
+    amplifyUsers: AmplifyUserData,
+    amplifySessions: AmplifyConferenceData,
+    firebaseUsers: FirebaseUserData,
+    firebaseSessions: FirebaseConferenceData
+  ) {
+    this.users = firebaseUsers;
+    this.sessions = firebaseSessions;
+    window.addEventListener('themeChanged', (ev: CustomEvent) => {
+      this.users = !ev.detail.isDark ? amplifyUsers : firebaseUsers;
+      this.sessions = !ev.detail.isDark ? amplifySessions : firebaseSessions;
+    });
+  }
+
+  //// User
+  async user(): Promise<User> {
+    return await this.users.user();
+  }
+
+  async updateUser(userOptions: UserUpdate): Promise<any> {
+    return this.users.updateUser(userOptions);
+  }
+
+  async signIn(userOptions: UserOptions): Promise<any> {
+    return this.users.signIn(userOptions);
+  }
+
+  async signOut(): Promise<any> {
+    return this.users.signOut();
+  }
+
+  async signUp(userOptions: UserOptions): Promise<any> {
+    return this.users.signUp(userOptions);
+  }
+
+  async confirmSignup(username: string, code: string): Promise<any> {
+    return this.users.confirmSignup(username, code);
+  }
+
+  async isSignedIn(): Promise<boolean> {
+    return await this.users.isSignedIn();
+  }
+
+  //// Favorites
+  hasFavorite(sessionName: string): boolean {
+    return this.favorites.has(sessionName);
+  }
+
+  addFavorite(sessionName: string): void {
+    this.favorites.add(sessionName);
+  }
+
+  removeFavorite(sessionName: string): void {
+    this.favorites.delete(sessionName);
+  }
+
+  //// Sessions
   sessionById(sessionId: string): Observable<any> {
     return this.sessions.sessionById(sessionId);
   }
@@ -183,6 +170,7 @@ export default class Repository {
       )));
   }
 
+  //// Speakers
   speakerById(speakerId: string): Observable<any>  {
     return this.sessions.speakerById(speakerId);
   }
@@ -191,10 +179,12 @@ export default class Repository {
     return this.sessions.listSpeakers();
   }
 
+  //// Tracks
   listTracks(): Observable<any> {
     return this.sessions.listTracks();
   }
 
+  //// Locations
   listLocations(): Observable<any> {
     return this.sessions.listLocations();
   }

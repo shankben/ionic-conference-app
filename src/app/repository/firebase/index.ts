@@ -1,4 +1,7 @@
 import { Injectable } from '@angular/core';
+import { AngularFirestore } from '@angular/fire/firestore';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 import * as firebase from 'firebase/app';
 import 'firebase/auth';
@@ -6,18 +9,16 @@ import 'firebase/storage';
 
 import { UserOptions, UserUpdate } from '../../interfaces/user-options';
 import { User } from '../../interfaces/user';
-import { environment } from '../../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
-export class FirebaseUserData {
+export default class FirebaseStrategy {
   private onAuthStateChanged(user: any) {
     if (user && !user.isAnonymous) {
       window.dispatchEvent(new CustomEvent('user:signin'));
     }
   }
 
-  constructor() {
-    firebase.initializeApp(environment.firebase);
+  constructor(private readonly afs: AngularFirestore) {
     firebase.auth().onAuthStateChanged(this.onAuthStateChanged);
     firebase.auth().signInAnonymously();
   }
@@ -93,5 +94,38 @@ export class FirebaseUserData {
 
   async isSignedIn(): Promise<boolean> {
     return Boolean(firebase.auth().currentUser);
+  }
+
+  sessionById(sessionId: string): Observable<any> {
+    return this.afs
+      .collection('sessions', (ref) => ref.limit(1)
+        .where('id', '==', sessionId))
+      .valueChanges();
+  }
+
+  listSessions(): Observable<any> {
+    return this.afs.collection('sessions').get()
+      .pipe(map(({ docs }) => docs.map((it) => it.data())));
+  }
+
+  speakerById(speakerId: string): Observable<any> {
+    return this.afs
+      .collection('speakers', (ref) => ref.limit(1)
+        .where('id', '==', speakerId))
+      .valueChanges();
+  }
+
+  listSpeakers(): Observable<any> {
+    return this.afs
+      .collection('speakers', (ref) => ref.orderBy('name'))
+      .valueChanges();
+  }
+
+  listTracks(): Observable<any> {
+    return this.afs.collection('tracks').valueChanges();
+  }
+
+  listLocations(): Observable<any> {
+    return this.afs.collection('locations').valueChanges();
   }
 }

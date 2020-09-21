@@ -1,16 +1,75 @@
 import { Injectable } from '@angular/core';
 import Amplify, { Auth, Storage } from 'aws-amplify';
 import { CognitoUser } from '@aws-amplify/auth';
+import {
+  OperatorFunction,
+  Observer,
+  Observable,
+  from,
+  merge
+} from 'rxjs';
 
+import { map } from 'rxjs/operators';
 import { UserOptions, UserUpdate } from '../../interfaces/user-options';
 import { User } from '../../interfaces/user';
-
 import { environment } from '../../../environments/environment';
 
+import {
+  APIService,
+  GetSessionQuery,
+  GetSpeakerQuery,
+  ListLocationsQuery,
+  ListSessionsQuery,
+  ListSpeakersQuery,
+  ListTracksQuery,
+  UpdatedLocationSubscription
+} from './API.service';
+
+interface KeyIdLike {
+  key: string;
+  id: string;
+}
+
+interface NameLike {
+  name: string;
+}
+
+interface Unsubscribable {
+  unsubscribe(): void;
+}
+
 @Injectable({ providedIn: 'root' })
-export class AmplifyUserData {
-  constructor() {
+export default class AmplifyStrategy {
+
+  private locationsSubscription: Unsubscribable;
+
+  private oneKeyToId<T>(item: KeyIdLike): T {
+    item.id = item.key;
+    return (item as unknown) as T;
+  }
+
+  private keysToIds<T>(): OperatorFunction<KeyIdLike[], T[]> {
+    return map((items: KeyIdLike[]) =>
+      items.map((it: KeyIdLike) =>
+        this.oneKeyToId<T>(it)));
+  }
+
+  private keyToId<T>(): OperatorFunction<KeyIdLike, T> {
+    return map((item: KeyIdLike) => this.oneKeyToId(item));
+  }
+
+  private sortByName<T>(): OperatorFunction<NameLike[], T[]> {
+    return map((items: NameLike[]) =>
+      (items.sort((x, y) => x.name <= y.name ? -1 : 1) as unknown[]) as T[]);
+  }
+
+  constructor(private readonly appSyncService: APIService) {
     Amplify.configure(environment.amplify);
+    window.addEventListener('themeChanged', (ev: CustomEvent) => {
+      if (ev.detail.isDark && this.locationsSubscription) {
+        this.locationsSubscription.unsubscribe();
+      }
+    });
   }
 
   private async blobToDataUrl(blob: Blob): Promise<string> {
@@ -122,5 +181,43 @@ export class AmplifyUserData {
     } catch (err) {
       return false;
     }
+  }
+
+  sessionById(sessionId: string): Observable<GetSessionQuery> {
+    return from(this.appSyncService.GetSession(sessionId)).pipe(this.keyToId());
+  }
+
+  listSessions(): Observable<ListSessionsQuery[]> {
+    return from(this.appSyncService.ListSessions()).pipe(this.keysToIds());
+  }
+
+  speakerById(speakerId: string): Observable<GetSpeakerQuery> {
+    return from(this.appSyncService.GetSpeaker(speakerId)).pipe(this.keyToId());
+  }
+
+  listSpeakers(): Observable<ListSpeakersQuery[]> {
+    return from(this.appSyncService.ListSpeakers())
+      .pipe(this.keysToIds())
+      .pipe(this.sortByName());
+  }
+
+  listTracks(): Observable<ListTracksQuery[]> {
+    return from(this.appSyncService.ListTracks());
+  }
+
+  listLocations(): Observable<ListLocationsQuery[]> {
+    try {
+      this.locationsSubscription.unsubscribe();
+    } catch (err) {
+      // OK: Always unconditionally unsubscribe
+    }
+    const obs = Observable
+      .create((observer: Observer<UpdatedLocationSubscription[]>) => {
+        this.locationsSubscription = this.appSyncService.UpdatedLocationListener
+          .subscribe((res: any) => observer
+            .next([res.value.data.updatedLocation]));
+      });
+    const ls = from(this.appSyncService.ListLocations());
+    return merge(ls, obs);
   }
 }

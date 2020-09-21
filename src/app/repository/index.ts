@@ -6,10 +6,8 @@ import { UserOptions, UserUpdate } from '../interfaces/user-options';
 import { User } from '../interfaces/user';
 import { Session } from '../interfaces/session';
 
-import { AmplifyUserData } from './amplify/user-data';
-import { AmplifyConferenceData } from './amplify/conference-data';
-import { FirebaseUserData } from './firebase/user-data';
-import { FirebaseConferenceData } from './firebase/conference-data';
+import AmplifyStrategy from './amplify';
+import FirebaseStrategy from './firebase';
 
 
 interface SessionGroupItem {
@@ -26,8 +24,8 @@ interface SessionGroup {
 
 @Injectable({ providedIn: 'root' })
 export default class Repository {
-  private users: AmplifyUserData | FirebaseUserData;
-  private sessions: AmplifyConferenceData | FirebaseConferenceData;
+  private strategy: AmplifyStrategy | FirebaseStrategy;
+
   private favorites: Set<string> = new Set();
 
   private filterSession(
@@ -109,46 +107,42 @@ export default class Repository {
   }
 
   constructor(
-    amplifyUsers: AmplifyUserData,
-    amplifySessions: AmplifyConferenceData,
-    firebaseUsers: FirebaseUserData,
-    firebaseSessions: FirebaseConferenceData
+    amplifyStrategy: AmplifyStrategy,
+    firebaseStrategy: FirebaseStrategy
   ) {
-    this.users = firebaseUsers;
-    this.sessions = firebaseSessions;
+    this.strategy = firebaseStrategy;
     window.addEventListener('themeChanged', (ev: CustomEvent) => {
-      this.users = !ev.detail.isDark ? amplifyUsers : firebaseUsers;
-      this.sessions = !ev.detail.isDark ? amplifySessions : firebaseSessions;
+      this.strategy = !ev.detail.isDark ? amplifyStrategy : firebaseStrategy;
     });
   }
 
   //// User
   async user(): Promise<User> {
-    return await this.users.user();
+    return await this.strategy.user();
   }
 
   async updateUser(userOptions: UserUpdate): Promise<any> {
-    return this.users.updateUser(userOptions);
+    return this.strategy.updateUser(userOptions);
   }
 
   async signIn(userOptions: UserOptions): Promise<any> {
-    return this.users.signIn(userOptions);
+    return this.strategy.signIn(userOptions);
   }
 
   async signOut(): Promise<any> {
-    return this.users.signOut();
+    return this.strategy.signOut();
   }
 
   async signUp(userOptions: UserOptions): Promise<any> {
-    return this.users.signUp(userOptions);
+    return this.strategy.signUp(userOptions);
   }
 
   async confirmSignup(username: string, code: string): Promise<any> {
-    return this.users.confirmSignup(username, code);
+    return this.strategy.confirmSignup(username, code);
   }
 
   async isSignedIn(): Promise<boolean> {
-    return await this.users.isSignedIn();
+    return await this.strategy.isSignedIn();
   }
 
   //// Favorites
@@ -166,7 +160,7 @@ export default class Repository {
 
   //// Sessions
   sessionById(sessionId: string): Observable<Session> {
-    return this.sessions.sessionById(sessionId);
+    return this.strategy.sessionById(sessionId);
   }
 
   listSessions(
@@ -175,7 +169,7 @@ export default class Repository {
     excludeTracks: any[] = [],
     segment = 'all'
   ): Observable<SessionGroup> {
-    return this.sessions.listSessions().pipe(map((sessions) =>
+    return this.strategy.listSessions().pipe(map((sessions) =>
       this.groupSessions(
         sessions,
         dayIndex,
@@ -187,20 +181,20 @@ export default class Repository {
 
   //// Speakers
   speakerById(speakerId: string): Observable<any>  {
-    return this.sessions.speakerById(speakerId);
+    return this.strategy.speakerById(speakerId);
   }
 
   listSpeakers(): Observable<any> {
-    return this.sessions.listSpeakers();
+    return this.strategy.listSpeakers();
   }
 
   //// Tracks
   listTracks(): Observable<any> {
-    return this.sessions.listTracks();
+    return this.strategy.listTracks();
   }
 
   //// Locations
   listLocations(): Observable<any> {
-    return this.sessions.listLocations();
+    return this.strategy.listLocations();
   }
 }

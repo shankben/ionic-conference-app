@@ -63,6 +63,18 @@ export default class AmplifyStrategy {
       (items.sort((x, y) => x.name <= y.name ? -1 : 1) as unknown[]) as T[]);
   }
 
+  private async blobToDataUrl(blob: Blob): Promise<string> {
+    return new Promise((resolve, reject) => {
+      try {
+        const fr = new FileReader();
+        fr.onload = (ev) => resolve(ev.target.result as string);
+        fr.readAsDataURL(blob);
+      } catch (err) {
+        reject(err);
+      }
+    });
+  }
+
   constructor(private readonly appSyncService: APIService) {
     Amplify.configure(environment.amplify);
     window.addEventListener('themeChanged', (ev: CustomEvent) => {
@@ -72,18 +84,8 @@ export default class AmplifyStrategy {
     });
   }
 
-  private async blobToDataUrl(blob: Blob): Promise<string> {
-    return new Promise((resolve, reject) => {
-      try {
-        const fr = new FileReader();
-        fr.onload = (e) => resolve(e.target.result as string);
-        fr.readAsDataURL(blob);
-      } catch (err) {
-        reject(err);
-      }
-    });
-  }
 
+  //// User
   async user(): Promise<User> {
     try {
       const user = await Auth.currentAuthenticatedUser();
@@ -144,6 +146,13 @@ export default class AmplifyStrategy {
     }
   }
 
+  async signOut(): Promise<any> {
+    if (Auth.currentAuthenticatedUser()) {
+      await Auth.signOut();
+    }
+    window.dispatchEvent(new CustomEvent('user:signout'));
+  }
+
   async confirmSignup(username: string, code: string): Promise<any> {
     try {
       await Auth.confirmSignUp(username, code);
@@ -168,13 +177,6 @@ export default class AmplifyStrategy {
     }
   }
 
-  async signOut(): Promise<any> {
-    if (Auth.currentAuthenticatedUser()) {
-      await Auth.signOut();
-    }
-    window.dispatchEvent(new CustomEvent('user:signout'));
-  }
-
   async isSignedIn(): Promise<boolean> {
     try {
       return Boolean(await Auth.currentAuthenticatedUser());
@@ -183,6 +185,8 @@ export default class AmplifyStrategy {
     }
   }
 
+
+  //// Sessions
   sessionById(sessionId: string): Observable<GetSessionQuery> {
     return from(this.appSyncService.GetSession(sessionId)).pipe(this.keyToId());
   }
@@ -191,6 +195,8 @@ export default class AmplifyStrategy {
     return from(this.appSyncService.ListSessions()).pipe(this.keysToIds());
   }
 
+
+  //// Speakers
   speakerById(speakerId: string): Observable<GetSpeakerQuery> {
     return from(this.appSyncService.GetSpeaker(speakerId)).pipe(this.keyToId());
   }
@@ -201,10 +207,14 @@ export default class AmplifyStrategy {
       .pipe(this.sortByName());
   }
 
+
+  //// Tracks
   listTracks(): Observable<ListTracksQuery[]> {
     return from(this.appSyncService.ListTracks());
   }
 
+
+  //// Locations
   listLocations(): Observable<ListLocationsQuery[]> {
     try {
       this.locationsSubscription.unsubscribe();

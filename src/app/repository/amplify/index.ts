@@ -1,22 +1,15 @@
 import { Injectable } from '@angular/core';
 import Amplify, { Auth, Storage } from 'aws-amplify';
 import { CognitoUser } from '@aws-amplify/auth';
+
 import {
-  OperatorFunction,
-  Observer,
   Observable,
   from,
   merge
 } from 'rxjs';
 
-import { map } from 'rxjs/operators';
-import { environment } from '../../../environments/environment';
-Amplify.configure(environment.amplify);
-
 import {
-  KeyIdLike,
   Location,
-  NameLike,
   Session,
   Speaker,
   Track,
@@ -26,44 +19,18 @@ import {
   UserUpdate
 } from '../../models';
 
+import { environment } from '../../../environments/environment';
+
+import * as utils from './utils';
+
+Amplify.configure(environment.amplify);
+
 import { APIService } from './API.service';
 
 @Injectable({ providedIn: 'root' })
 export default class AmplifyStrategy {
 
   private locationsSubscription: Unsubscribable;
-
-  private oneKeyToId<T>(item: KeyIdLike): T {
-    item.id = item.key;
-    return (item as unknown) as T;
-  }
-
-  private keysToIds<T>(): OperatorFunction<KeyIdLike[], T[]> {
-    return map((items: KeyIdLike[]) =>
-      items.map((it: KeyIdLike) =>
-        this.oneKeyToId<T>(it)));
-  }
-
-  private keyToId<T>(): OperatorFunction<KeyIdLike, T> {
-    return map((item: KeyIdLike) => this.oneKeyToId(item));
-  }
-
-  private sortByName<T>(): OperatorFunction<NameLike[], T[]> {
-    return map((items: NameLike[]) =>
-      (items.sort((x, y) => x.name <= y.name ? -1 : 1) as unknown[]) as T[]);
-  }
-
-  private async blobToDataUrl(blob: Blob): Promise<string> {
-    return new Promise((resolve, reject) => {
-      try {
-        const fr = new FileReader();
-        fr.onload = (ev) => resolve(ev.target.result as string);
-        fr.readAsDataURL(blob);
-      } catch (err) {
-        reject(err);
-      }
-    });
-  }
 
   constructor(private readonly appSyncService: APIService) {
     window.addEventListener('themeChanged', (ev: CustomEvent) => {
@@ -83,7 +50,7 @@ export default class AmplifyStrategy {
       }
       const { picture } = user.attributes;
       const res = await Storage.get(picture, { download: true }) as any;
-      const pictureUrl = await this.blobToDataUrl(res.Body);
+      const pictureUrl = await utils.blobToDataUrl(res.Body);
       return {
         username: user.attributes.preferred_username || user.username,
         email: user.attributes.email,
@@ -177,23 +144,25 @@ export default class AmplifyStrategy {
 
   //// Sessions
   sessionById(sessionId: string): Observable<Session> {
-    return from(this.appSyncService.GetSession(sessionId)).pipe(this.keyToId());
+    return from(this.appSyncService.GetSession(sessionId))
+      .pipe(utils.keyToId());
   }
 
   listSessions(): Observable<Session[]> {
-    return from(this.appSyncService.ListSessions()).pipe(this.keysToIds());
+    return from(this.appSyncService.ListSessions()).pipe(utils.keysToIds());
   }
 
 
   //// Speakers
   speakerById(speakerId: string): Observable<Speaker> {
-    return from(this.appSyncService.GetSpeaker(speakerId)).pipe(this.keyToId());
+    return from(this.appSyncService.GetSpeaker(speakerId))
+      .pipe(utils.keyToId());
   }
 
   listSpeakers(): Observable<Speaker[]> {
     return from(this.appSyncService.ListSpeakers())
-      .pipe(this.keysToIds())
-      .pipe(this.sortByName());
+      .pipe(utils.keysToIds())
+      .pipe(utils.sortByName());
   }
 
 
@@ -210,14 +179,14 @@ export default class AmplifyStrategy {
     } catch (err) {
       // OK: Always unconditionally unsubscribe
     }
-    const obs = Observable
-      .create((observer: Observer<Location[]>) => {
-        this.locationsSubscription = this.appSyncService
-          .UpdatedLocationListener
-          .subscribe((res: any) => observer
-            .next([res.value.data.updatedLocation as Location]));
-      });
-    const ls = from(this.appSyncService.ListLocations());
-    return merge(ls, obs);
+    const {
+      observable,
+      subscription
+    } = utils.observableFromSubscription(
+      this.appSyncService.UpdatedLocationListener
+    );
+    this.locationsSubscription = subscription;
+    const listLocations = from(this.appSyncService.ListLocations());
+    return merge(listLocations, observable);
   }
 }

@@ -5,14 +5,15 @@ import { environment } from '../../environments/environment';
 import AmplifyStrategy from './amplify';
 import FirebaseStrategy from './firebase';
 import {
+  Location,
   Session,
   SessionGroup,
   SessionGroupItem,
+  Speaker,
+  Track,
   User,
   UserOptions,
-  UserUpdate,
-  Speaker,
-  Track
+  UserUpdate
 } from '../models';
 
 @Injectable({ providedIn: 'root' })

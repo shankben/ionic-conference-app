@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
 import Repository from '../../repository';
-import { UserOptions } from '../../interfaces/user-options';
+import { UserOptions } from '../../models';
 
 @Component({
   selector: 'page-signup',

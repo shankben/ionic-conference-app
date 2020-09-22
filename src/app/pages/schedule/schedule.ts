@@ -24,7 +24,6 @@ export class SchedulePage implements OnInit {
   @ViewChild('scheduleList', { static: true }) scheduleList: IonList;
 
   ios: boolean;
-  dayIndex = 0;
   queryText = '';
   segment = 'all';
   excludeTracks: any = [];
@@ -56,7 +55,6 @@ export class SchedulePage implements OnInit {
       this.scheduleList.closeSlidingItems();
     }
     this.repository.listSessions(
-      this.dayIndex,
       this.queryText,
       this.excludeTracks,
       this.segment

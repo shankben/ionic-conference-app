@@ -10,33 +10,23 @@ import {
 } from 'rxjs';
 
 import { map } from 'rxjs/operators';
-import { UserOptions, UserUpdate } from '../../interfaces/user-options';
-import { User } from '../../interfaces/user';
 import { environment } from '../../../environments/environment';
+Amplify.configure(environment.amplify);
 
 import {
-  APIService,
-  GetSessionQuery,
-  GetSpeakerQuery,
-  ListLocationsQuery,
-  ListSessionsQuery,
-  ListSpeakersQuery,
-  ListTracksQuery,
-  UpdatedLocationSubscription
-} from './API.service';
+  KeyIdLike,
+  Location,
+  NameLike,
+  Session,
+  Speaker,
+  Track,
+  Unsubscribable,
+  User,
+  UserOptions,
+  UserUpdate
+} from '../../models';
 
-interface KeyIdLike {
-  key: string;
-  id: string;
-}
-
-interface NameLike {
-  name: string;
-}
-
-interface Unsubscribable {
-  unsubscribe(): void;
-}
+import { APIService } from './API.service';
 
 @Injectable({ providedIn: 'root' })
 export default class AmplifyStrategy {
@@ -76,7 +66,6 @@ export default class AmplifyStrategy {
   }
 
   constructor(private readonly appSyncService: APIService) {
-    Amplify.configure(environment.amplify);
     window.addEventListener('themeChanged', (ev: CustomEvent) => {
       if (ev.detail.isDark && this.locationsSubscription) {
         this.locationsSubscription.unsubscribe();
@@ -136,7 +125,7 @@ export default class AmplifyStrategy {
     }
   }
 
-  async signIn(userOptions: UserOptions): Promise<any> {
+  async signIn(userOptions: UserOptions): Promise<boolean> {
     const { email, password } = userOptions;
     try {
       await Auth.signIn(email, password);
@@ -146,14 +135,14 @@ export default class AmplifyStrategy {
     }
   }
 
-  async signOut(): Promise<any> {
+  async signOut() {
     if (Auth.currentAuthenticatedUser()) {
       await Auth.signOut();
     }
     window.dispatchEvent(new CustomEvent('user:signout'));
   }
 
-  async confirmSignup(username: string, code: string): Promise<any> {
+  async confirmSignup(username: string, code: string) {
     try {
       await Auth.confirmSignUp(username, code);
     } catch (err) {
@@ -161,7 +150,7 @@ export default class AmplifyStrategy {
     }
   }
 
-  async signUp(userOptions: UserOptions): Promise<any> {
+  async signUp(userOptions: UserOptions) {
     const { username, email, password } = userOptions;
     try {
       await Auth.signUp({
@@ -187,21 +176,21 @@ export default class AmplifyStrategy {
 
 
   //// Sessions
-  sessionById(sessionId: string): Observable<GetSessionQuery> {
+  sessionById(sessionId: string): Observable<Session> {
     return from(this.appSyncService.GetSession(sessionId)).pipe(this.keyToId());
   }
 
-  listSessions(): Observable<ListSessionsQuery[]> {
+  listSessions(): Observable<Session[]> {
     return from(this.appSyncService.ListSessions()).pipe(this.keysToIds());
   }
 
 
   //// Speakers
-  speakerById(speakerId: string): Observable<GetSpeakerQuery> {
+  speakerById(speakerId: string): Observable<Speaker> {
     return from(this.appSyncService.GetSpeaker(speakerId)).pipe(this.keyToId());
   }
 
-  listSpeakers(): Observable<ListSpeakersQuery[]> {
+  listSpeakers(): Observable<Speaker[]> {
     return from(this.appSyncService.ListSpeakers())
       .pipe(this.keysToIds())
       .pipe(this.sortByName());
@@ -209,23 +198,24 @@ export default class AmplifyStrategy {
 
 
   //// Tracks
-  listTracks(): Observable<ListTracksQuery[]> {
+  listTracks(): Observable<Track[]> {
     return from(this.appSyncService.ListTracks());
   }
 
 
   //// Locations
-  listLocations(): Observable<ListLocationsQuery[]> {
+  listLocations(): Observable<Location[]> {
     try {
       this.locationsSubscription.unsubscribe();
     } catch (err) {
       // OK: Always unconditionally unsubscribe
     }
     const obs = Observable
-      .create((observer: Observer<UpdatedLocationSubscription[]>) => {
-        this.locationsSubscription = this.appSyncService.UpdatedLocationListener
+      .create((observer: Observer<Location[]>) => {
+        this.locationsSubscription = this.appSyncService
+          .UpdatedLocationListener
           .subscribe((res: any) => observer
-            .next([res.value.data.updatedLocation]));
+            .next([res.value.data.updatedLocation as Location]));
       });
     const ls = from(this.appSyncService.ListLocations());
     return merge(ls, obs);

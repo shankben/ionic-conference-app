@@ -21,7 +21,7 @@ export class SessionDetailPage {
   ionViewWillEnter() {
     const sessionId = this.route.snapshot.paramMap.get('sessionId');
     this.repository.sessionById(sessionId).subscribe((it) => {
-      this.session = Array.isArray(it) ? it.shift() : it;
+      this.session = it;
       this.isFavorite = this.repository.hasFavorite(this.session.name);
     });
   }

@@ -1,18 +1,30 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { map, mergeAll } from 'rxjs/operators';
 
+import { User as FirebaseUser } from 'firebase';
 import * as firebase from 'firebase/app';
 import 'firebase/auth';
 import 'firebase/storage';
 
-import { UserOptions, UserUpdate } from '../../interfaces/user-options';
-import { User } from '../../interfaces/user';
+import {
+  KeyIdLike,
+  Location,
+  NameLike,
+  Session,
+  Speaker,
+  Track,
+  Unsubscribable,
+  User,
+  UserOptions,
+  UserUpdate
+} from '../../models';
+
 
 @Injectable({ providedIn: 'root' })
 export default class FirebaseStrategy {
-  private onAuthStateChanged(user: any) {
+  private onAuthStateChanged(user: FirebaseUser) {
     if (user && !user.isAnonymous) {
       window.dispatchEvent(new CustomEvent('user:signin'));
     }
@@ -57,7 +69,7 @@ export default class FirebaseStrategy {
     }
   }
 
-  async signIn(userOptions: UserOptions): Promise<any> {
+  async signIn(userOptions: UserOptions): Promise<boolean> {
     const { email, password } = userOptions;
     try {
       await firebase.auth().signInWithEmailAndPassword(email, password);
@@ -67,14 +79,14 @@ export default class FirebaseStrategy {
     }
   }
 
-  async signOut(): Promise<any> {
+  async signOut() {
     if (firebase.auth().currentUser) {
       firebase.auth().signOut();
     }
     window.dispatchEvent(new CustomEvent('user:signout'));
   }
 
-  async signUp(userOptions: UserOptions): Promise<any> {
+  async signUp(userOptions: UserOptions) {
     const { username, email, password } = userOptions;
     try {
       await firebase.auth().createUserWithEmailAndPassword(email, password);
@@ -88,7 +100,7 @@ export default class FirebaseStrategy {
     }
   }
 
-  async confirmSignup(username: string, code: string): Promise<any> {
+  async confirmSignup(username: string, code: string) {
     return;
   }
 
@@ -96,36 +108,41 @@ export default class FirebaseStrategy {
     return Boolean(firebase.auth().currentUser);
   }
 
-  sessionById(sessionId: string): Observable<any> {
+  sessionById(sessionId: string): Observable<Session> {
     return this.afs
       .collection('sessions', (ref) => ref.limit(1)
         .where('id', '==', sessionId))
-      .valueChanges();
+      .valueChanges()
+      .pipe(mergeAll()) as Observable<Session>;
   }
 
-  listSessions(): Observable<any> {
+  listSessions(): Observable<Session[]> {
     return this.afs.collection('sessions').get()
-      .pipe(map(({ docs }) => docs.map((it) => it.data())));
+      .pipe(map(({ docs }) => docs
+        .map((it) => it.data() as Session)));
   }
 
-  speakerById(speakerId: string): Observable<any> {
+  speakerById(speakerId: string): Observable<Speaker> {
     return this.afs
       .collection('speakers', (ref) => ref.limit(1)
         .where('id', '==', speakerId))
-      .valueChanges();
+      .valueChanges()
+      .pipe(mergeAll()) as Observable<Speaker>;
   }
 
-  listSpeakers(): Observable<any> {
+  listSpeakers(): Observable<Speaker[]> {
     return this.afs
       .collection('speakers', (ref) => ref.orderBy('name'))
-      .valueChanges();
+      .valueChanges() as Observable<Speaker[]>;
   }
 
-  listTracks(): Observable<any> {
-    return this.afs.collection('tracks').valueChanges();
+  listTracks(): Observable<Track[]> {
+    return this.afs.collection('tracks')
+      .valueChanges() as Observable<Track[]>;
   }
 
-  listLocations(): Observable<any> {
-    return this.afs.collection('locations').valueChanges();
+  listLocations(): Observable<Location[]> {
+    return this.afs.collection('locations')
+      .valueChanges() as Observable<Location[]>;
   }
 }

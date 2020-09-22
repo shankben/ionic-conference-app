@@ -21,11 +21,7 @@ export class SpeakerDetailPage {
 
   ionViewWillEnter() {
     const speakerId = this.route.snapshot.paramMap.get('speakerId');
-    this.repository.speakerById(speakerId)
-      .subscribe((it) => {
-        console.log({ speaker: it });
-        this.speaker = Array.isArray(it) ? it.shift() : it;
-      });
+    this.repository.speakerById(speakerId).subscribe((it) => this.speaker = it);
   }
 
   openExternalUrl(url: string) {

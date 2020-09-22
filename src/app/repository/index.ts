@@ -1,26 +1,19 @@
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { Injectable } from '@angular/core';
-
-import { UserOptions, UserUpdate } from '../interfaces/user-options';
-import { User } from '../interfaces/user';
-import { Session } from '../interfaces/session';
-
+import { environment } from '../../environments/environment';
 import AmplifyStrategy from './amplify';
 import FirebaseStrategy from './firebase';
-
-
-interface SessionGroupItem {
-  time?: string;
-  hide: boolean;
-  sessions: Session[];
-}
-
-interface SessionGroup {
-  shownSessions: number;
-  groups: SessionGroupItem[];
-}
-
+import {
+  Session,
+  SessionGroup,
+  SessionGroupItem,
+  User,
+  UserOptions,
+  UserUpdate,
+  Speaker,
+  Track
+} from '../models';
 
 @Injectable({ providedIn: 'root' })
 export default class Repository {
@@ -67,7 +60,6 @@ export default class Repository {
 
   private groupSessions(
     sessions: Session[],
-    dayIndex: number,
     queryText = '',
     excludeTracks: any[] = [],
     segment = 'all'
@@ -110,9 +102,13 @@ export default class Repository {
     amplifyStrategy: AmplifyStrategy,
     firebaseStrategy: FirebaseStrategy
   ) {
-    this.strategy = firebaseStrategy;
+    this.strategy = environment.provider === 'firebase' ?
+      firebaseStrategy :
+      amplifyStrategy;
     window.addEventListener('themeChanged', (ev: CustomEvent) => {
-      this.strategy = !ev.detail.isDark ? amplifyStrategy : firebaseStrategy;
+      this.strategy = !ev.detail.isDark ?
+        amplifyStrategy :
+        firebaseStrategy;
     });
   }
 
@@ -164,7 +160,6 @@ export default class Repository {
   }
 
   listSessions(
-    dayIndex: number,
     queryText = '',
     excludeTracks: any[] = [],
     segment = 'all'
@@ -172,7 +167,6 @@ export default class Repository {
     return this.strategy.listSessions().pipe(map((sessions) =>
       this.groupSessions(
         sessions,
-        dayIndex,
         queryText.toLowerCase().replace(/,|\.|-/g, ' '),
         excludeTracks,
         segment
@@ -180,21 +174,21 @@ export default class Repository {
   }
 
   //// Speakers
-  speakerById(speakerId: string): Observable<any>  {
+  speakerById(speakerId: string): Observable<Speaker>  {
     return this.strategy.speakerById(speakerId);
   }
 
-  listSpeakers(): Observable<any> {
+  listSpeakers(): Observable<Speaker[]> {
     return this.strategy.listSpeakers();
   }
 
   //// Tracks
-  listTracks(): Observable<any> {
+  listTracks(): Observable<Track[]> {
     return this.strategy.listTracks();
   }
 
   //// Locations
-  listLocations(): Observable<any> {
+  listLocations(): Observable<Location[]> {
     return this.strategy.listLocations();
   }
 }

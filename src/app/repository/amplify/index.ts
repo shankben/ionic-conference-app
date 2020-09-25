@@ -2,8 +2,51 @@ import { Injectable } from '@angular/core';
 import Amplify, { Auth, Storage } from 'aws-amplify';
 import { CognitoUser } from '@aws-amplify/auth';
 
+
+// /////////////////////////////
+// import API, { graphqlOperation, GRAPHQL_AUTH_MODE } from '@aws-amplify/api';
+// import { ListLocationsQuery } from './API.service';
+//
+// const listLocationsIam = async (): Promise<Array<ListLocationsQuery>> => {
+//   const statement = `query ListLocations {
+//       listLocations {
+//         __typename
+//         center
+//         city
+//         key
+//         lat
+//         lng
+//         name
+//         state
+//         updatedAt
+//         weather {
+//           __typename
+//           description
+//           feelsLike
+//           humidity
+//           iconUrl
+//           pressure
+//           status
+//           temp
+//           tempMax
+//           tempMin
+//           updatedAt
+//         }
+//       }
+//     }`;
+//   const req = {
+//     ...graphqlOperation(statement),
+//     authMode: GRAPHQL_AUTH_MODE.AWS_IAM
+//   };
+//   const response = (await API.graphql(req)) as any;
+//   return response.data.listLocations;
+// };
+// /////////////////////////////
+
+
 import {
   Observable,
+  of,
   from,
   merge
 } from 'rxjs';
@@ -58,8 +101,9 @@ export default class AmplifyStrategy {
       };
     } catch (err) {
       return {
-        username: 'anonymous',
+        isAnonymous: true,
         email: 'anonymous',
+        username: 'anonymous',
         picture: 'http://www.gravatar.com/avatar'
       };
     }
@@ -103,10 +147,12 @@ export default class AmplifyStrategy {
   }
 
   async signOut() {
-    if (Auth.currentAuthenticatedUser()) {
+    try {
       await Auth.signOut();
+      window.dispatchEvent(new CustomEvent('user:signout'));
+    } catch (err) {
+      // OK: Sign out unconditionally
     }
-    window.dispatchEvent(new CustomEvent('user:signout'));
   }
 
   async confirmSignup(username: string, code: string) {
@@ -135,7 +181,8 @@ export default class AmplifyStrategy {
 
   async isSignedIn(): Promise<boolean> {
     try {
-      return Boolean(await Auth.currentAuthenticatedUser());
+      const user = await Auth.currentAuthenticatedUser();
+      return Boolean(user) && !user.isAnonymous;
     } catch (err) {
       return false;
     }
@@ -143,6 +190,10 @@ export default class AmplifyStrategy {
 
 
   //// Sessions
+  toggleLikeSession(sessionId: string): Observable<void> {
+    return;
+  }
+
   sessionById(sessionId: string): Observable<Session> {
     return from(this.appSyncService.GetSession(sessionId))
       .pipe(utils.keyToId());
@@ -174,6 +225,11 @@ export default class AmplifyStrategy {
 
   //// Locations
   listLocations(): Observable<Location[]> {
+    // listLocationsIam().then((res) => {
+    //   console.log(res);
+    // });
+
+
     try {
       this.locationsSubscription.unsubscribe();
     } catch (err) {
@@ -186,7 +242,19 @@ export default class AmplifyStrategy {
       this.appSyncService.UpdatedLocationListener
     );
     this.locationsSubscription = subscription;
-    const listLocations = from(this.appSyncService.ListLocations());
-    return merge(listLocations, observable);
+
+    // let data;
+    // try {
+    //   data = await this.appSyncService.ListLocations();
+    //   data = data.data;
+    // } catch (err) {
+    //   data = err.data;
+    // }
+
+    // const listLocations = from(data.data);
+    // const listLocations = of(data);
+
+
+    return merge(this.appSyncService.ListLocations(), observable);
   }
 }

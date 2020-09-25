@@ -24,10 +24,18 @@ export interface Session {
   timeStart: string;
   tracks: Array<string>;
   updatedAt: string;
+  likes?: Array<string>;
 }
 
 
 //// User
+export interface User {
+  email: string;
+  picture: string;
+  username: string;
+  isAnonymous?: boolean;
+}
+
 export interface UserOptions {
   email: string;
   password: string;
@@ -37,12 +45,6 @@ export interface UserOptions {
 export interface UserUpdate {
   displayName?: string;
   profilePicture?: File;
-}
-
-export interface User {
-  email: string;
-  picture: string;
-  username: string;
 }
 
 

@@ -30,7 +30,7 @@
     </ion-text>
   </div>
 
-  <ion-list>
+  <ion-list *ngIf="session">
     <ion-item (click)="sessionClick('watch')" button>
       <ion-label color="primary">Watch</ion-label>
     </ion-item>
@@ -44,8 +44,14 @@
       <ion-label color="primary">Download Video</ion-label>
       <ion-icon slot="end" color="primary" size="small" name="cloud-download"></ion-icon>
     </ion-item>
-    <ion-item (click)="sessionClick('leave feedback')" button>
-      <ion-label color="primary">Leave Feedback</ion-label>
+    <ion-item (click)="toggleLike()" button>
+      <ion-label color="primary">Likes</ion-label>
+      <ion-note
+        *ngIf="session.likes"
+        slot="end"
+        [color]="isLiked ? 'success' : 'primary'">
+        {{session.likes.length}}
+      </ion-note>
     </ion-item>
   </ion-list>
 </ion-content>

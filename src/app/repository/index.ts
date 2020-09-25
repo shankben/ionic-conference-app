@@ -49,7 +49,7 @@ export default class Repository {
     let matchesSegment = false;
 
     if (segment === 'favorites') {
-      if (this.hasFavorite(session.name)) {
+      if (this.favorites.has(session.name)) {
         matchesSegment = true;
       }
     } else {
@@ -143,28 +143,32 @@ export default class Repository {
   }
 
   //// Favorites
-  hasFavorite(sessionName: string): boolean {
+  async hasFavorite(sessionName: string): Promise<boolean> {
     return this.favorites.has(sessionName);
   }
 
-  addFavorite(sessionName: string): void {
+  async addFavorite(sessionName: string): Promise<void> {
     this.favorites.add(sessionName);
   }
 
-  removeFavorite(sessionName: string): void {
+  async removeFavorite(sessionName: string): Promise<void> {
     this.favorites.delete(sessionName);
   }
 
   //// Sessions
-  sessionById(sessionId: string): Observable<Session> {
+  async toggleLikeSession(sessionId: string) {
+    return this.strategy.toggleLikeSession(sessionId);
+  }
+
+  async sessionById(sessionId: string): Promise<Observable<Session>> {
     return this.strategy.sessionById(sessionId);
   }
 
-  listSessions(
+  async listSessions(
     queryText = '',
     excludeTracks: any[] = [],
     segment = 'all'
-  ): Observable<SessionGroup> {
+  ): Promise<Observable<SessionGroup>> {
     return this.strategy.listSessions().pipe(map((sessions) =>
       this.groupSessions(
         sessions,
@@ -175,21 +179,21 @@ export default class Repository {
   }
 
   //// Speakers
-  speakerById(speakerId: string): Observable<Speaker>  {
+  async speakerById(speakerId: string): Promise<Observable<Speaker>>  {
     return this.strategy.speakerById(speakerId);
   }
 
-  listSpeakers(): Observable<Speaker[]> {
+  async listSpeakers(): Promise<Observable<Speaker[]>> {
     return this.strategy.listSpeakers();
   }
 
   //// Tracks
-  listTracks(): Observable<Track[]> {
+  async listTracks(): Promise<Observable<Track[]>> {
     return this.strategy.listTracks();
   }
 
   //// Locations
-  listLocations(): Observable<Location[]> {
+  async listLocations(): Promise<Observable<Location[]>> {
     return this.strategy.listLocations();
   }
 }

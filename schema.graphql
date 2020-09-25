@@ -4,7 +4,7 @@ schema {
   subscription: Subscription
 }
 
-type Location {
+type Location @aws_api_key @aws_cognito_user_pools(cognito_groups : ["Users"]) @aws_iam {
   center: Boolean
   city: String!
   key: ID!
@@ -16,7 +16,7 @@ type Location {
   weather: LocationWeather
 }
 
-type LocationWeather {
+type LocationWeather @aws_api_key @aws_cognito_user_pools(cognito_groups : ["Users"]) @aws_iam {
   description: String!
   feelsLike: Float!
   humidity: Int!
@@ -30,24 +30,24 @@ type LocationWeather {
 }
 
 type Mutation {
-  updateLocation(input: LocationInput!): Location
-  updateSession(input: SessionInput!): Session
-  updateSpeaker(input: SpeakerInput!): Speaker
-  updateTrack(input: TrackInput!): Track
+  updateLocation(input: LocationInput!): Location @aws_api_key @aws_cognito_user_pools(cognito_groups : ["Users"]) @aws_iam
+  updateSession(input: SessionInput!): Session @aws_api_key @aws_cognito_user_pools(cognito_groups : ["Users"]) @aws_iam
+  updateSpeaker(input: SpeakerInput!): Speaker @aws_api_key @aws_cognito_user_pools(cognito_groups : ["Users"]) @aws_iam
+  updateTrack(input: TrackInput!): Track @aws_api_key @aws_cognito_user_pools(cognito_groups : ["Users"]) @aws_iam
 }
 
 type Query {
-  getLocation(key: ID!): Location
-  getSession(key: ID!): Session
-  getSpeaker(key: ID!): Speaker
-  getTrack(key: ID!): Track
-  listLocations: [Location]
-  listSessions: [Session]
-  listSpeakers: [Speaker]
-  listTracks: [Track]
+  getLocation(key: ID!): Location @aws_api_key @aws_cognito_user_pools(cognito_groups : ["Users"]) @aws_iam
+  getSession(key: ID!): Session @aws_api_key @aws_cognito_user_pools(cognito_groups : ["Users"]) @aws_iam
+  getSpeaker(key: ID!): Speaker @aws_api_key @aws_cognito_user_pools(cognito_groups : ["Users"]) @aws_iam
+  getTrack(key: ID!): Track @aws_api_key @aws_cognito_user_pools(cognito_groups : ["Users"]) @aws_iam
+  listLocations: [Location] @aws_api_key @aws_cognito_user_pools(cognito_groups : ["Users"]) @aws_iam
+  listSessions: [Session] @aws_api_key @aws_cognito_user_pools(cognito_groups : ["Users"]) @aws_iam
+  listSpeakers: [Speaker] @aws_api_key @aws_cognito_user_pools(cognito_groups : ["Users"]) @aws_iam
+  listTracks: [Track] @aws_api_key @aws_cognito_user_pools(cognito_groups : ["Users"]) @aws_iam
 }
 
-type Session {
+type Session @aws_api_key @aws_cognito_user_pools(cognito_groups : ["Users"]) @aws_iam {
   date: String!
   description: String
   groupId: String!
@@ -62,7 +62,7 @@ type Session {
   updatedAt: AWSDateTime!
 }
 
-type Speaker {
+type Speaker @aws_api_key @aws_cognito_user_pools(cognito_groups : ["Users"]) @aws_iam {
   about: String!
   email: String!
   id: String!
@@ -78,13 +78,13 @@ type Speaker {
 }
 
 type Subscription {
-  updatedLocation: Location @aws_subscribe(mutations : ["updateLocation"])
-  updatedSession: Session @aws_subscribe(mutations : ["updateSession"])
-  updatedSpeaker: Speaker @aws_subscribe(mutations : ["updateSpeaker"])
-  updatedTrack: Track @aws_subscribe(mutations : ["updateTrack"])
+  updatedLocation: Location @aws_api_key @aws_cognito_user_pools(cognito_groups : ["Users"]) @aws_iam @aws_subscribe(mutations : ["updateLocation"])
+  updatedSession: Session @aws_api_key @aws_cognito_user_pools(cognito_groups : ["Users"]) @aws_iam @aws_subscribe(mutations : ["updateSession"])
+  updatedSpeaker: Speaker @aws_api_key @aws_cognito_user_pools(cognito_groups : ["Users"]) @aws_iam @aws_subscribe(mutations : ["updateSpeaker"])
+  updatedTrack: Track @aws_api_key @aws_cognito_user_pools(cognito_groups : ["Users"]) @aws_iam @aws_subscribe(mutations : ["updateTrack"])
 }
 
-type Track {
+type Track @aws_api_key @aws_cognito_user_pools(cognito_groups : ["Users"]) @aws_iam {
   icon: String!
   key: ID!
   name: String!

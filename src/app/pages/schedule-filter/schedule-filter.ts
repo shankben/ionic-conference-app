@@ -21,12 +21,12 @@ export class ScheduleFilterPage {
     public navParams: NavParams
   ) { }
 
-  ionViewWillEnter() {
+  async ionViewWillEnter() {
     this.ios = this.config.get('mode') === `ios`;
 
     const excludedTrackNames = this.navParams.get('excludedTracks');
 
-    this.repository.listTracks().subscribe((tracks: any[]) => {
+    (await this.repository.listTracks()).subscribe((tracks: any[]) => {
       tracks.forEach((track) => this.tracks.push({
         ...track,
         isChecked: (excludedTrackNames.indexOf(track.name) === -1)

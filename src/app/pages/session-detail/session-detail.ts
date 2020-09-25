@@ -1,7 +1,9 @@
+import { ToastController } from '@ionic/angular';
 import { Component } from '@angular/core';
 
 import { ActivatedRoute } from '@angular/router';
 import Repository from '../../repository';
+import { Session } from '../../models';
 
 @Component({
   selector: 'page-session-detail',
@@ -9,20 +11,25 @@ import Repository from '../../repository';
   templateUrl: 'session-detail.html'
 })
 export class SessionDetailPage {
-  session: any;
+  session: Session;
   isFavorite = false;
+  isLiked = false;
   defaultHref = '';
 
   constructor(
     private repository: Repository,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private toastCtrl: ToastController
   ) { }
 
-  ionViewWillEnter() {
+  async ionViewWillEnter() {
+    const user = await this.repository.user();
     const sessionId = this.route.snapshot.paramMap.get('sessionId');
-    this.repository.sessionById(sessionId).subscribe((it) => {
+    (await this.repository.sessionById(sessionId)).subscribe((it) => {
       this.session = it;
-      this.isFavorite = this.repository.hasFavorite(this.session.name);
+      this.isLiked = new Set(this.session.likes ?? []).has(user.username);
+      this.repository.hasFavorite(this.session.name)
+        .then((val) => this.isFavorite = val);
     });
   }
 
@@ -34,13 +41,28 @@ export class SessionDetailPage {
     console.log('Clicked', item);
   }
 
-  toggleFavorite() {
-    if (this.repository.hasFavorite(this.session.name)) {
-      this.repository.removeFavorite(this.session.name);
-      this.isFavorite = false;
+  async toggleLike() {
+    try {
+      await this.repository.toggleLikeSession(this.session.id);
+      (await this.toastCtrl.create({
+        message: `${!this.isLiked ? 'Unl' : 'L'}iked ${this.session.name}!`,
+        duration: 3000
+      })).present();
+    } catch (err) {
+      (await this.toastCtrl.create({
+        message: 'Sign in to like sessions!',
+        duration: 3000
+      })).present();
+    }
+  }
+
+  async toggleFavorite() {
+    const hasFavorite = await this.repository.hasFavorite(this.session.name);
+    this.isFavorite = !hasFavorite;
+    if (hasFavorite) {
+      await this.repository.removeFavorite(this.session.name);
     } else {
-      this.repository.addFavorite(this.session.name);
-      this.isFavorite = true;
+      await this.repository.addFavorite(this.session.name);
     }
   }
 

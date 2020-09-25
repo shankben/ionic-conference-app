@@ -62,7 +62,7 @@ export class MapPage implements AfterViewInit {
 
     let map: any;
 
-    this.repository.listLocations().subscribe((locations: any) => {
+    (await this.repository.listLocations()).subscribe((locations: any) => {
       const mapEle = this.mapElement.nativeElement;
 
       map = new googleMaps.Map(mapEle, {

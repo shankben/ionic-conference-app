@@ -19,16 +19,14 @@ export class SpeakerDetailPage {
     public inAppBrowser: InAppBrowser,
   ) { }
 
-  ionViewWillEnter() {
+  async ionViewWillEnter() {
     const speakerId = this.route.snapshot.paramMap.get('speakerId');
-    this.repository.speakerById(speakerId).subscribe((it) => this.speaker = it);
+    (await this.repository.speakerById(speakerId))
+      .subscribe((it) => this.speaker = it);
   }
 
   openExternalUrl(url: string) {
-    this.inAppBrowser.create(
-      url,
-      '_blank'
-    );
+    this.inAppBrowser.create(url, '_blank');
   }
 
   async openSpeakerShare(speaker: any) {

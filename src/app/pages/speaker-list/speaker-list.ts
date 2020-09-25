@@ -10,11 +10,11 @@ export class SpeakerListPage {
   speakers: any[] = [];
 
   private load() {
-    this.repository.listSpeakers()
-      .subscribe((speakers: any[]) => this.speakers = speakers);
+    this.repository.listSpeakers().then((obs) =>
+      obs.subscribe((speakers: any[]) => this.speakers = speakers));
   }
 
-  constructor(public repository: Repository) {
+  constructor(private readonly repository: Repository) {
     window.addEventListener('themeChanged', () => this.load());
   }
 

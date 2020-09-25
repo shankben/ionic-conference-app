@@ -48,7 +48,10 @@ export class AppComponent implements OnInit, AfterViewInit {
     };
     window.addEventListener('user:signin', updateUserStatus);
     window.addEventListener('user:signup', updateUserStatus);
-    window.addEventListener('user:signout', () => this.signedIn = false);
+    window.addEventListener('user:signout', () => {
+      this.signedIn = false;
+      this.repository.user().then((user) => this.user = user);
+    });
     // Hub.listen(/.*/, (data) => {
     //   console.log('Listening for all messages: ', data.payload.data);
     // });
@@ -69,28 +72,28 @@ export class AppComponent implements OnInit, AfterViewInit {
     this.initializeApp();
   }
 
-  private loadData() {
+  private async loadData() {
     try {
-      this.repository.user().then((res) => this.user = res);
-      this.repository.listLocations()
-        .subscribe((locations: any) => {
-          const center = locations.find((it: any) => it.center);
-          if (!center) {
-            return;
-          }
-          this.weather = center.weather;
-          this.weather.updatedAt = 'Updated ' + new Intl.DateTimeFormat('en', {
-            year: 'numeric',
-            month: 'short',
-            day: '2-digit',
-            hour: 'numeric',
-            hour12: true,
-            minute: 'numeric'
-          }).format(new Date(this.weather.updatedAt));
-        });
-      } catch (err) {
-        console.error(err);
-      }
+      this.user = await this.repository.user();
+      (await this.repository.listLocations()).subscribe((locations: any) => {
+        const center = locations.find((it: any) => it.center);
+        if (!center) {
+          return;
+        }
+        this.weather = center.weather;
+        this.weather.updatedAt = 'Updated ' + new Intl.DateTimeFormat('en', {
+          year: 'numeric',
+          month: 'short',
+          day: '2-digit',
+          hour: 'numeric',
+          hour12: true,
+          minute: 'numeric'
+        }).format(new Date(this.weather.updatedAt));
+      });
+    } catch (err) {
+      console.error('//////////////////////////////');
+      console.error(err);
+    }
   }
 
   private async initializeApp() {
@@ -119,7 +122,7 @@ export class AppComponent implements OnInit, AfterViewInit {
   async ngAfterViewInit() {
     const appEl = this.doc.querySelector('ion-app');
     const observer = new MutationObserver((mutations) => {
-      mutations.forEach((mutation) => {
+      mutations.forEach(async (mutation) => {
         if (mutation.attributeName !== 'class') {
           return;
         }
@@ -128,7 +131,7 @@ export class AppComponent implements OnInit, AfterViewInit {
         window.dispatchEvent(new CustomEvent('themeChanged', {
           detail: { isDark }
         }));
-        this.loadData();
+        await this.loadData();
       });
     });
     observer.observe(appEl, {

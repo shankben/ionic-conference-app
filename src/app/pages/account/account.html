@@ -8,7 +8,9 @@
 </ion-header>
 
 <ion-content>
-  <div *ngIf="user" class="ion-padding-top ion-text-center">
+  <div
+    *ngIf="user && !user.isAnonymous" 
+    class="ion-padding-top ion-text-center">
     <img [src]="user.picture" alt="avatar" />
     <h2>{{ user.username || user.email }}</h2>
 

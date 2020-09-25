@@ -7,15 +7,13 @@ import { User as FirebaseUser } from 'firebase';
 import * as firebase from 'firebase/app';
 import 'firebase/auth';
 import 'firebase/storage';
+import 'firebase/firestore';
 
 import {
-  KeyIdLike,
   Location,
-  NameLike,
   Session,
   Speaker,
   Track,
-  Unsubscribable,
   User,
   UserOptions,
   UserUpdate
@@ -24,21 +22,24 @@ import {
 
 @Injectable({ providedIn: 'root' })
 export default class FirebaseStrategy {
-  private onAuthStateChanged(user: FirebaseUser) {
-    if (user && !user.isAnonymous) {
-      window.dispatchEvent(new CustomEvent('user:signin'));
-    }
-  }
-
   constructor(private readonly afs: AngularFirestore) {
-    firebase.auth().onAuthStateChanged(this.onAuthStateChanged);
-    firebase.auth().signInAnonymously();
+    firebase.auth().onAuthStateChanged((user: FirebaseUser) => {
+      if (user && !user.isAnonymous) {
+        window.dispatchEvent(new CustomEvent('user:signin'));
+      }
+    });
   }
 
+
+  //// User
   async user(): Promise<User> {
+    if (!firebase.auth().currentUser) {
+      await firebase.auth().signInAnonymously();
+    }
     const user = firebase.auth().currentUser;
     if (user) {
       return {
+        isAnonymous: user.isAnonymous ?? false,
         username: user.displayName || user.email,
         email: user.email,
         picture: user.photoURL ?? 'http://www.gravatar.com/avatar'
@@ -82,6 +83,7 @@ export default class FirebaseStrategy {
   async signOut() {
     if (firebase.auth().currentUser) {
       firebase.auth().signOut();
+      firebase.auth().signInAnonymously();
     }
     window.dispatchEvent(new CustomEvent('user:signout'));
   }
@@ -100,49 +102,83 @@ export default class FirebaseStrategy {
     }
   }
 
-  async confirmSignup(username: string, code: string) {
+  confirmSignup(username: string, code: string) {
     return;
   }
 
-  async isSignedIn(): Promise<boolean> {
+  isSignedIn(): boolean {
     return Boolean(firebase.auth().currentUser);
+  }
+
+
+  //// Sessions
+  async toggleLikeSession(sessionId: string) {
+    const user = await this.user();
+    if (user.isAnonymous) {
+      throw new Error('Not signed in');
+    }
+    const { docs } = await firebase.firestore()
+      .collection('sessions')
+      .where('id', '==', sessionId)
+      .limit(1)
+      .get();
+    const session = docs.shift();
+    const likes = new Set(session.data().likes ?? []);
+    if (!likes.has(user.username)) {
+      likes.add(user.username);
+    } else {
+      likes.delete(user.username);
+    }
+    try {
+      await session.ref.update({ likes: Array.from(likes) });
+    } catch (err) {
+      console.log({err});
+    }
   }
 
   sessionById(sessionId: string): Observable<Session> {
     return this.afs
-      .collection('sessions', (ref) => ref.limit(1)
+      .collection<Session>('sessions', (ref) => ref.limit(1)
         .where('id', '==', sessionId))
       .valueChanges()
-      .pipe(mergeAll()) as Observable<Session>;
+      .pipe(mergeAll());
   }
 
   listSessions(): Observable<Session[]> {
-    return this.afs.collection('sessions').get()
-      .pipe(map(({ docs }) => docs
-        .map((it) => it.data() as Session)));
+    return this.afs
+      .collection<Session>('sessions')
+      .valueChanges();
   }
 
+
+  //// Speakers
   speakerById(speakerId: string): Observable<Speaker> {
     return this.afs
-      .collection('speakers', (ref) => ref.limit(1)
+      .collection<Speaker>('speakers', (ref) => ref.limit(1)
         .where('id', '==', speakerId))
       .valueChanges()
-      .pipe(mergeAll()) as Observable<Speaker>;
+      .pipe(mergeAll());
   }
 
   listSpeakers(): Observable<Speaker[]> {
     return this.afs
-      .collection('speakers', (ref) => ref.orderBy('name'))
-      .valueChanges() as Observable<Speaker[]>;
+      .collection<Speaker>('speakers', (ref) => ref.orderBy('name'))
+      .valueChanges();
   }
 
+
+  //// Tracks
   listTracks(): Observable<Track[]> {
-    return this.afs.collection('tracks')
-      .valueChanges() as Observable<Track[]>;
+    return this.afs
+      .collection<Track>('tracks')
+      .valueChanges();
   }
 
+
+  //// Locations
   listLocations(): Observable<Location[]> {
-    return this.afs.collection('locations')
-      .valueChanges() as Observable<Location[]>;
+    return this.afs
+      .collection<Location>('locations')
+      .valueChanges();
   }
 }

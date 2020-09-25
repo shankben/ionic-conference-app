@@ -22,12 +22,14 @@ export class AccountPage {
   ) {
     this.setUser();
     window.addEventListener('user:signin', () => this.setUser());
+    window.addEventListener('themeChanged', () => this.setUser());
   }
 
   async profilePictureChange(ev: Event) {
     const fileInput = ev.target as HTMLInputElement;
     const file = Array.from(fileInput.files).pop();
     await this.repository.updateUser({ profilePicture: file });
+    this.setUser();
   }
 
   async changeUsername() {

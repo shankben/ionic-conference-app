@@ -42,23 +42,25 @@ export class SchedulePage implements OnInit {
     public routerOutlet: IonRouterOutlet,
     public repository: Repository
   ) {
-    window.addEventListener('themeChanged', () => this.updateSchedule());
+    window.addEventListener('themeChanged', async () => {
+      await this.updateSchedule();
+    });
   }
 
-  ngOnInit() {
-    this.updateSchedule();
+  async ngOnInit() {
+    await this.updateSchedule();
     this.ios = this.config.get('mode') === 'ios';
   }
 
-  updateSchedule() {
+  async updateSchedule() {
     if (this.scheduleList) {
       this.scheduleList.closeSlidingItems();
     }
-    this.repository.listSessions(
+    (await this.repository.listSessions(
       this.queryText,
       this.excludeTracks,
       this.segment
-    ).subscribe((data: any) => {
+    )).subscribe((data: any) => {
       this.shownSessions = data.shownSessions;
       this.groups = data.groups;
     });
@@ -76,15 +78,20 @@ export class SchedulePage implements OnInit {
     const { data } = await modal.onWillDismiss();
     if (data) {
       this.excludeTracks = data;
-      this.updateSchedule();
+      await this.updateSchedule();
     }
   }
 
   async addFavorite(slidingItem: HTMLIonItemSlidingElement, sessionData: any) {
-    if (this.repository.hasFavorite(sessionData.name)) {
-      this.removeFavorite(slidingItem, sessionData, 'Favorite already added');
+    const hasFavorite = await this.repository.hasFavorite(sessionData.name);
+    if (hasFavorite) {
+      await this.removeFavorite(
+        slidingItem,
+        sessionData,
+        'Favorite already added'
+      );
     } else {
-      this.repository.addFavorite(sessionData.name);
+      await this.repository.addFavorite(sessionData.name);
       slidingItem.close();
       const toast = await this.toastController.create({
         header: `${sessionData.name} was successfully added as a favorite.`,
@@ -113,9 +120,9 @@ export class SchedulePage implements OnInit {
         },
         {
           text: 'Remove',
-          handler: () => {
-            this.repository.removeFavorite(sessionData.name);
-            this.updateSchedule();
+          handler: async () => {
+            await this.repository.removeFavorite(sessionData.name);
+            await this.updateSchedule();
             slidingItem.close();
           }
         }

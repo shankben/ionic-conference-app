@@ -19,10 +19,6 @@ import {
   UserUpdate
 } from '../../models';
 
-import {
-  UpdatedLocationSubscription
-} from './API.service';
-
 Amplify.configure(environment.amplify);
 
 
@@ -34,7 +30,13 @@ export default class AmplifyStrategy {
   constructor() {
     window.addEventListener('themeChanged', (ev: CustomEvent) => {
       if (ev.detail.isDark) {
-        Object.values(this.subscriptions).forEach((it) => it.unsubscribe());
+        Object.values(this.subscriptions).forEach((it) => {
+          try {
+            it.unsubscribe();
+          } catch (err) {
+            // OK
+          }
+        });
       }
     });
   }

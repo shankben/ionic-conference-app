@@ -8,6 +8,8 @@ import * as queries from './graphql/queries';
 import * as subscriptions from './graphql/subscriptions';
 import { environment } from '../../../environments/environment';
 import * as utils from './utils';
+import { performGraphqlOperation } from './utils';
+
 import {
   Location,
   Session,
@@ -151,7 +153,7 @@ export default class AmplifyStrategy {
     if (user.isAnonymous) {
       throw new Error('Not signed in');
     }
-    const session = await utils.performGraphqlOperation<Session>(
+    const session = await performGraphqlOperation<Session>(
       queries.getSession,
       { key: sessionId }
     );
@@ -162,7 +164,7 @@ export default class AmplifyStrategy {
       likes.delete(user.username);
     }
     try {
-      await utils.performGraphqlOperation<Session>(
+      await performGraphqlOperation<Session>(
         mutations.updateSession,
         {input: {
           key: sessionId,
@@ -185,28 +187,28 @@ export default class AmplifyStrategy {
     );
     this.subscriptions.sessionById = subscription;
     return merge(
-      from(utils.performGraphqlOperation<Session>(queries.getSession, {
+      from(performGraphqlOperation<Session>(queries.getSession, {
         key: sessionId
       })),
       observable
-    ).pipe(utils.keyToId<Session>());
+    ).pipe(utils.keyToId());
   }
 
   listSessions(): Observable<Session[]> {
-    return from(utils.performGraphqlOperation<Session[]>(queries.listSessions))
+    return from(performGraphqlOperation<Session[]>(queries.listSessions))
       .pipe(utils.keysToIds());
   }
 
 
   //// Speakers
   speakerById(speakerId: string): Observable<Speaker> {
-    return from(utils.performGraphqlOperation<Speaker>(queries.getSpeaker, {
+    return from(performGraphqlOperation<Speaker>(queries.getSpeaker, {
       key: speakerId
     })).pipe(utils.keyToId());
   }
 
   listSpeakers(): Observable<Speaker[]> {
-    return from(utils.performGraphqlOperation<Speaker[]>(queries.listSpeakers))
+    return from(performGraphqlOperation<Speaker[]>(queries.listSpeakers))
       .pipe(utils.keysToIds())
       .pipe(utils.sortByName());
   }
@@ -214,7 +216,7 @@ export default class AmplifyStrategy {
 
   //// Tracks
   listTracks(): Observable<Track[]> {
-    return from(utils.performGraphqlOperation<Track[]>(queries.listTracks));
+    return from(performGraphqlOperation<Track[]>(queries.listTracks));
   }
 
   //// Locations
@@ -229,7 +231,7 @@ export default class AmplifyStrategy {
     );
     this.subscriptions.listLocations = subscription;
     return merge(
-      from(utils.performGraphqlOperation<Location[]>(queries.listLocations)),
+      from(performGraphqlOperation<Location[]>(queries.listLocations)),
       observable.pipe(map((it) => [it]))
     );
   }

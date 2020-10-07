@@ -1,56 +1,13 @@
 import { Injectable } from '@angular/core';
+import { Observable, from, merge } from 'rxjs';
+import { map } from 'rxjs/operators';
 import Amplify, { Auth, Storage } from 'aws-amplify';
 import { CognitoUser } from '@aws-amplify/auth';
-
-
-// /////////////////////////////
-// import API, { graphqlOperation, GRAPHQL_AUTH_MODE } from '@aws-amplify/api';
-// import { ListLocationsQuery } from './API.service';
-//
-// const listLocationsIam = async (): Promise<Array<ListLocationsQuery>> => {
-//   const statement = `query ListLocations {
-//       listLocations {
-//         __typename
-//         center
-//         city
-//         key
-//         lat
-//         lng
-//         name
-//         state
-//         updatedAt
-//         weather {
-//           __typename
-//           description
-//           feelsLike
-//           humidity
-//           iconUrl
-//           pressure
-//           status
-//           temp
-//           tempMax
-//           tempMin
-//           updatedAt
-//         }
-//       }
-//     }`;
-//   const req = {
-//     ...graphqlOperation(statement),
-//     authMode: GRAPHQL_AUTH_MODE.AWS_IAM
-//   };
-//   const response = (await API.graphql(req)) as any;
-//   return response.data.listLocations;
-// };
-// /////////////////////////////
-
-
-import {
-  Observable,
-  of,
-  from,
-  merge
-} from 'rxjs';
-
+import * as mutations from './graphql/mutations';
+import * as queries from './graphql/queries';
+import * as subscriptions from './graphql/subscriptions';
+import { environment } from '../../../environments/environment';
+import * as utils from './utils';
 import {
   Location,
   Session,
@@ -62,23 +19,22 @@ import {
   UserUpdate
 } from '../../models';
 
-import { environment } from '../../../environments/environment';
-
-import * as utils from './utils';
+import {
+  UpdatedLocationSubscription
+} from './API.service';
 
 Amplify.configure(environment.amplify);
 
-import { APIService } from './API.service';
 
 @Injectable({ providedIn: 'root' })
 export default class AmplifyStrategy {
 
-  private locationsSubscription: Unsubscribable;
+  private subscriptions: {[k: string]: Unsubscribable} = {};
 
-  constructor(private readonly appSyncService: APIService) {
+  constructor() {
     window.addEventListener('themeChanged', (ev: CustomEvent) => {
-      if (ev.detail.isDark && this.locationsSubscription) {
-        this.locationsSubscription.unsubscribe();
+      if (ev.detail.isDark) {
+        Object.values(this.subscriptions).forEach((it) => it.unsubscribe());
       }
     });
   }
@@ -136,6 +92,15 @@ export default class AmplifyStrategy {
     }
   }
 
+  async isSignedIn(): Promise<boolean> {
+    try {
+      const user = await Auth.currentAuthenticatedUser();
+      return Boolean(user) && !user.isAnonymous;
+    } catch (err) {
+      return false;
+    }
+  }
+
   async signIn(userOptions: UserOptions): Promise<boolean> {
     const { email, password } = userOptions;
     try {
@@ -155,14 +120,6 @@ export default class AmplifyStrategy {
     }
   }
 
-  async confirmSignup(username: string, code: string) {
-    try {
-      await Auth.confirmSignUp(username, code);
-    } catch (err) {
-      console.error(err);
-    }
-  }
-
   async signUp(userOptions: UserOptions) {
     const { username, email, password } = userOptions;
     try {
@@ -174,44 +131,80 @@ export default class AmplifyStrategy {
         }
       });
     } catch (err) {
-      console.error(err);
       throw err;
     }
   }
 
-  async isSignedIn(): Promise<boolean> {
+  async confirmSignup(username: string, code: string) {
     try {
-      const user = await Auth.currentAuthenticatedUser();
-      return Boolean(user) && !user.isAnonymous;
+      await Auth.confirmSignUp(username, code);
     } catch (err) {
-      return false;
+      throw err;
     }
   }
 
-
   //// Sessions
-  toggleLikeSession(sessionId: string): Observable<void> {
-    return;
+  async toggleLikeSession(sessionId: string) {
+    const user = await this.user();
+    if (user.isAnonymous) {
+      throw new Error('Not signed in');
+    }
+    const session = await utils.performGraphqlOperation<Session>(
+      queries.getSession,
+      { key: sessionId }
+    );
+    const likes = new Set(session.likes ?? []);
+    if (!likes.has(user.username)) {
+      likes.add(user.username);
+    } else {
+      likes.delete(user.username);
+    }
+    try {
+      await utils.performGraphqlOperation<Session>(
+        mutations.updateSession,
+        {input: {
+          key: sessionId,
+          likes: Array.from(likes)
+        }}
+      );
+    } catch (err) {
+      console.error(err);
+    }
   }
 
   sessionById(sessionId: string): Observable<Session> {
-    return from(this.appSyncService.GetSession(sessionId))
-      .pipe(utils.keyToId());
+    try {
+      this.subscriptions.sessionById.unsubscribe();
+    } catch (err) {
+      // OK: Always unconditionally unsubscribe
+    }
+    const { observable, subscription } = utils.subscribe<Session>(
+      subscriptions.updatedSession
+    );
+    this.subscriptions.sessionById = subscription;
+    return merge(
+      from(utils.performGraphqlOperation<Session>(queries.getSession, {
+        key: sessionId
+      })),
+      observable
+    ).pipe(utils.keyToId<Session>());
   }
 
   listSessions(): Observable<Session[]> {
-    return from(this.appSyncService.ListSessions()).pipe(utils.keysToIds());
+    return from(utils.performGraphqlOperation<Session[]>(queries.listSessions))
+      .pipe(utils.keysToIds());
   }
 
 
   //// Speakers
   speakerById(speakerId: string): Observable<Speaker> {
-    return from(this.appSyncService.GetSpeaker(speakerId))
-      .pipe(utils.keyToId());
+    return from(utils.performGraphqlOperation<Speaker>(queries.getSpeaker, {
+      key: speakerId
+    })).pipe(utils.keyToId());
   }
 
   listSpeakers(): Observable<Speaker[]> {
-    return from(this.appSyncService.ListSpeakers())
+    return from(utils.performGraphqlOperation<Speaker[]>(queries.listSpeakers))
       .pipe(utils.keysToIds())
       .pipe(utils.sortByName());
   }
@@ -219,42 +212,23 @@ export default class AmplifyStrategy {
 
   //// Tracks
   listTracks(): Observable<Track[]> {
-    return from(this.appSyncService.ListTracks());
+    return from(utils.performGraphqlOperation<Track[]>(queries.listTracks));
   }
-
 
   //// Locations
   listLocations(): Observable<Location[]> {
-    // listLocationsIam().then((res) => {
-    //   console.log(res);
-    // });
-
-
     try {
-      this.locationsSubscription.unsubscribe();
+      this.subscriptions.listLocations.unsubscribe();
     } catch (err) {
       // OK: Always unconditionally unsubscribe
     }
-    const {
-      observable,
-      subscription
-    } = utils.observableFromSubscription(
-      this.appSyncService.UpdatedLocationListener
+    const { observable, subscription } = utils.subscribe<Location>(
+      subscriptions.updatedLocation
     );
-    this.locationsSubscription = subscription;
-
-    // let data;
-    // try {
-    //   data = await this.appSyncService.ListLocations();
-    //   data = data.data;
-    // } catch (err) {
-    //   data = err.data;
-    // }
-
-    // const listLocations = from(data.data);
-    // const listLocations = of(data);
-
-
-    return merge(this.appSyncService.ListLocations(), observable);
+    this.subscriptions.listLocations = subscription;
+    return merge(
+      from(utils.performGraphqlOperation<Location[]>(queries.listLocations)),
+      observable.pipe(map((it) => [it]))
+    );
   }
 }

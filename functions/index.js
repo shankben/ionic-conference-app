@@ -44,17 +44,18 @@ exports.updateLocationWeather = functions.pubsub
         it.data().state
       );
       const icon = res.weather[0].icon;
+      const eps = 1e-7;
       const weather = {
-        feelsLike: res.main.feels_like,
-        humidity: res.main.humidity,
-        pressure: res.main.pressure,
-        temp: res.main.temp,
-        tempMax: res.main.temp_max,
-        tempMin : res.main.temp_min,
-        status: res.weather[0].main,
         description: res.weather[0].description,
-        updatedAt: new Date(parseInt(res.dt, 10) * 1000).toISOString(),
-        iconUrl: `http://openweathermap.org/img/wn/${icon}@2x.png`
+        feelsLike: res.main.feels_like + eps,
+        humidity: res.main.humidity,
+        iconUrl: `http://openweathermap.org/img/wn/${icon}@2x.png`,
+        pressure: res.main.pressure,
+        status: res.weather[0].main,
+        temp: res.main.temp + eps,
+        tempMax: res.main.temp_max + eps,
+        tempMin : res.main.temp_min + eps,
+        updatedAt: new Date(parseInt(res.dt, 10) * 1000).toISOString()
       };
       return it.ref.set({ weather }, { merge: true });
     }));

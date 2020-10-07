@@ -25,7 +25,7 @@ export default class Repository {
   private filterSession(
     session: any,
     queryWords: string[],
-    excludeTracks: any[],
+    excludeTracks: string[],
     segment: string
   ) {
     let matchesQueryText = false;
@@ -62,10 +62,14 @@ export default class Repository {
   private groupSessions(
     sessions: Session[],
     queryText = '',
-    excludeTracks: any[] = [],
+    excludeTracks: string[] = [],
     segment = 'all'
   ): SessionGroup {
-    const queryWords = queryText.split(' ').filter((it) => !!it.trim().length);
+    const queryWords = queryText
+      .toLowerCase()
+      .replace(/,|\.|-/g, ' ')
+      .split(' ')
+      .filter((it) => !!it.trim().length);
     const groups = new Map<string, SessionGroupItem>();
     let shownSessions = 0;
     sessions
@@ -118,29 +122,30 @@ export default class Repository {
     return await this.strategy.user();
   }
 
-  async updateUser(userOptions: UserUpdate): Promise<any> {
-    return this.strategy.updateUser(userOptions);
-  }
-
-  async signIn(userOptions: UserOptions): Promise<any> {
-    return this.strategy.signIn(userOptions);
-  }
-
-  async signOut(): Promise<any> {
-    return this.strategy.signOut();
-  }
-
-  async signUp(userOptions: UserOptions): Promise<any> {
-    return this.strategy.signUp(userOptions);
-  }
-
-  async confirmSignup(username: string, code: string): Promise<any> {
-    return this.strategy.confirmSignup(username, code);
-  }
-
   async isSignedIn(): Promise<boolean> {
     return await this.strategy.isSignedIn();
   }
+
+  async updateUser(userOptions: UserUpdate) {
+    return this.strategy.updateUser(userOptions);
+  }
+
+  async signIn(userOptions: UserOptions) {
+    return this.strategy.signIn(userOptions);
+  }
+
+  async signUp(userOptions: UserOptions) {
+    return this.strategy.signUp(userOptions);
+  }
+
+  async signOut() {
+    return this.strategy.signOut();
+  }
+
+  async confirmSignup(username: string, code: string) {
+    return this.strategy.confirmSignup(username, code);
+  }
+
 
   //// Favorites
   async hasFavorite(sessionName: string): Promise<boolean> {
@@ -166,16 +171,17 @@ export default class Repository {
 
   async listSessions(
     queryText = '',
-    excludeTracks: any[] = [],
+    excludeTracks: string[] = [],
     segment = 'all'
   ): Promise<Observable<SessionGroup>> {
-    return this.strategy.listSessions().pipe(map((sessions) =>
-      this.groupSessions(
+    return this.strategy.listSessions()
+      .pipe(map((sessions) => this.groupSessions(
         sessions,
-        queryText.toLowerCase().replace(/,|\.|-/g, ' '),
+        queryText,
         excludeTracks,
         segment
-      )));
+      )
+    ));
   }
 
   //// Speakers

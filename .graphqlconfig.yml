@@ -2,14 +2,12 @@ projects:
   Codegen Project:
     schemaPath: schema.graphql
     includes:
-      - src/app/graphql/**/*.graphql
-    excludes:
-      - ./schema.graphql
+      - src/app/repository/amplify/graphql/**/*.graphql
     extensions:
       amplify:
         codeGenTarget: angular
         generatedFileName: src/app/repository/amplify/API.service.ts
-        docsFilePath: src/app/graphql
+        docsFilePath: src/app/repository/amplify/graphql/
         region: us-east-1
         apiId: null
         frontend: javascript

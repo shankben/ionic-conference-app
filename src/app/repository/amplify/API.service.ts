@@ -2,24 +2,70 @@
 /* eslint-disable */
 //  This file was automatically generated and should not be edited.
 import { Injectable } from "@angular/core";
-import API, { graphqlOperation } from "@aws-amplify/api";
-import { GraphQLResult } from "@aws-amplify/api/lib/types";
+import API, { graphqlOperation, GraphQLResult } from "@aws-amplify/api-graphql";
 import { Observable } from "zen-observable-ts";
 
 export type LocationInput = {
+  center?: boolean | null;
+  city?: string | null;
   key: string;
+  lat?: number | null;
+  lng?: number | null;
+  name?: string | null;
+  state?: string | null;
+  updatedAt?: string | null;
+  weather?: LocationWeatherInput | null;
+};
+
+export type LocationWeatherInput = {
+  description?: string | null;
+  feelsLike?: number | null;
+  humidity?: number | null;
+  iconUrl?: string | null;
+  pressure?: number | null;
+  status?: string | null;
+  temp?: number | null;
+  tempMax?: number | null;
+  tempMin?: number | null;
+  updatedAt?: string | null;
 };
 
 export type SessionInput = {
+  date?: string | null;
+  description?: string | null;
+  groupId?: string | null;
+  id?: string | null;
   key: string;
+  likes?: Array<string | null> | null;
+  location?: string | null;
+  name?: string | null;
+  speakerNames?: Array<string | null> | null;
+  timeEnd?: string | null;
+  timeStart?: string | null;
+  tracks?: Array<string | null> | null;
+  updatedAt?: string | null;
 };
 
 export type SpeakerInput = {
+  about?: string | null;
+  email?: string | null;
+  id?: string | null;
+  instagram?: string | null;
   key: string;
+  location?: string | null;
+  name?: string | null;
+  phone?: string | null;
+  profilePic?: string | null;
+  title?: string | null;
+  twitter?: string | null;
+  updatedAt?: string | null;
 };
 
 export type TrackInput = {
+  icon?: string | null;
   key: string;
+  name?: string | null;
+  updatedAt?: string | null;
 };
 
 export type UpdateLocationMutation = {
@@ -44,7 +90,7 @@ export type UpdateLocationMutation = {
     tempMax: number;
     tempMin: number;
     updatedAt: string;
-  } | null;
+  };
 };
 
 export type UpdateSessionMutation = {
@@ -54,6 +100,7 @@ export type UpdateSessionMutation = {
   groupId: string;
   id: string;
   key: string;
+  likes: Array<string> | null;
   location: string;
   name: string;
   speakerNames: Array<string> | null;
@@ -109,7 +156,7 @@ export type GetLocationQuery = {
     tempMax: number;
     tempMin: number;
     updatedAt: string;
-  } | null;
+  };
 };
 
 export type GetSessionQuery = {
@@ -119,6 +166,7 @@ export type GetSessionQuery = {
   groupId: string;
   id: string;
   key: string;
+  likes: Array<string> | null;
   location: string;
   name: string;
   speakerNames: Array<string> | null;
@@ -174,7 +222,7 @@ export type ListLocationsQuery = {
     tempMax: number;
     tempMin: number;
     updatedAt: string;
-  } | null;
+  };
 };
 
 export type ListSessionsQuery = {
@@ -184,6 +232,7 @@ export type ListSessionsQuery = {
   groupId: string;
   id: string;
   key: string;
+  likes: Array<string> | null;
   location: string;
   name: string;
   speakerNames: Array<string> | null;
@@ -239,7 +288,7 @@ export type UpdatedLocationSubscription = {
     tempMax: number;
     tempMin: number;
     updatedAt: string;
-  } | null;
+  };
 };
 
 export type UpdatedSessionSubscription = {
@@ -249,6 +298,7 @@ export type UpdatedSessionSubscription = {
   groupId: string;
   id: string;
   key: string;
+  likes: Array<string> | null;
   location: string;
   name: string;
   speakerNames: Array<string> | null;
@@ -330,6 +380,7 @@ export class APIService {
           groupId
           id
           key
+          likes
           location
           name
           speakerNames
@@ -435,6 +486,7 @@ export class APIService {
           groupId
           id
           key
+          likes
           location
           name
           speakerNames
@@ -535,6 +587,7 @@ export class APIService {
           groupId
           id
           key
+          likes
           location
           name
           speakerNames
@@ -624,6 +677,7 @@ export class APIService {
           groupId
           id
           key
+          likes
           location
           name
           speakerNames

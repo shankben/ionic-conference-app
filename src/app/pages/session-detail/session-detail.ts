@@ -43,12 +43,13 @@ export class SessionDetailPage {
 
   async toggleLike() {
     try {
-      await this.repository.toggleLikeSession(this.session.id);
       (await this.toastCtrl.create({
-        message: `${!this.isLiked ? 'Unl' : 'L'}iked ${this.session.name}!`,
+        message: `${this.isLiked ? 'Unl' : 'L'}iked ${this.session.name}!`,
         duration: 3000
       })).present();
+      await this.repository.toggleLikeSession(this.session.id);
     } catch (err) {
+      console.log(err);
       (await this.toastCtrl.create({
         message: 'Sign in to like sessions!',
         duration: 3000

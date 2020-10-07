@@ -30,6 +30,7 @@ mutation UpdateSession($input: SessionInput!) {
     groupId
     id
     key
+    likes
     location
     name
     speakerNames

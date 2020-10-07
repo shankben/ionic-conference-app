@@ -13,10 +13,10 @@ type Location @aws_api_key @aws_cognito_user_pools(cognito_groups : ["Users"]) @
   name: String!
   state: String!
   updatedAt: AWSDateTime!
-  weather: LocationWeather
+  weather: LocationWeather!
 }
 
-type LocationWeather @aws_api_key @aws_cognito_user_pools(cognito_groups : ["Users"]) @aws_iam {
+type LocationWeather {
   description: String!
   feelsLike: Float!
   humidity: Int!
@@ -53,6 +53,7 @@ type Session @aws_api_key @aws_cognito_user_pools(cognito_groups : ["Users"]) @a
   groupId: String!
   id: String!
   key: ID!
+  likes: [String!]
   location: String!
   name: String!
   speakerNames: [String!]
@@ -92,17 +93,64 @@ type Track @aws_api_key @aws_cognito_user_pools(cognito_groups : ["Users"]) @aws
 }
 
 input LocationInput {
+  center: Boolean
+  city: String
   key: ID!
+  lat: Float
+  lng: Float
+  name: String
+  state: String
+  updatedAt: AWSDateTime
+  weather: LocationWeatherInput
+}
+
+input LocationWeatherInput {
+  description: String
+  feelsLike: Float
+  humidity: Int
+  iconUrl: String
+  pressure: Int
+  status: String
+  temp: Float
+  tempMax: Float
+  tempMin: Float
+  updatedAt: AWSDateTime
 }
 
 input SessionInput {
+  date: String
+  description: String
+  groupId: String
+  id: String
   key: ID!
+  likes: [String]
+  location: String
+  name: String
+  speakerNames: [String]
+  timeEnd: String
+  timeStart: String
+  tracks: [String]
+  updatedAt: AWSDateTime
 }
 
 input SpeakerInput {
+  about: String
+  email: String
+  id: String
+  instagram: String
   key: ID!
+  location: String
+  name: String
+  phone: String
+  profilePic: String
+  title: String
+  twitter: String
+  updatedAt: AWSDateTime
 }
 
 input TrackInput {
+  icon: String
   key: ID!
+  name: String
+  updatedAt: AWSDateTime
 }

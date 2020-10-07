@@ -30,6 +30,7 @@ query GetSession($key: ID!) {
     groupId
     id
     key
+    likes
     location
     name
     speakerNames
@@ -94,6 +95,7 @@ query ListSessions {
     groupId
     id
     key
+    likes
     location
     name
     speakerNames

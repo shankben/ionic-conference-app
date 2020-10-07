@@ -17,7 +17,7 @@ import { SwUpdate } from '@angular/service-worker';
 // import { Hub } from 'aws-amplify';
 // import { Subscription } from 'rxjs';
 
-import { User } from './models';
+import { User, Location } from './models';
 import Repository from './repository';
 
 import { environment } from '../environments/environment';
@@ -75,21 +75,23 @@ export class AppComponent implements OnInit, AfterViewInit {
   private async loadData() {
     try {
       this.user = await this.repository.user();
-      (await this.repository.listLocations()).subscribe((locations: any) => {
-        const center = locations.find((it: any) => it.center);
-        if (!center) {
-          return;
-        }
-        this.weather = center.weather;
-        this.weather.updatedAt = 'Updated ' + new Intl.DateTimeFormat('en', {
-          year: 'numeric',
-          month: 'short',
-          day: '2-digit',
-          hour: 'numeric',
-          hour12: true,
-          minute: 'numeric'
-        }).format(new Date(this.weather.updatedAt));
-      });
+      (await this.repository.listLocations())
+        .subscribe((locations: Location[]) => {
+          console.log(locations);
+          const center = locations.find((it: Location) => it.center);
+          if (!center) {
+            return;
+          }
+          this.weather = center.weather;
+          this.weather.updatedAt = 'Updated ' + new Intl.DateTimeFormat('en', {
+            year: 'numeric',
+            month: 'short',
+            day: '2-digit',
+            hour: 'numeric',
+            hour12: true,
+            minute: 'numeric'
+          }).format(new Date(this.weather.updatedAt));
+        });
     } catch (err) {
       console.error('//////////////////////////////');
       console.error(err);

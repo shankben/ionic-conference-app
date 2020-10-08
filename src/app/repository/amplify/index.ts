@@ -8,7 +8,7 @@ import * as queries from './graphql/queries';
 import * as subscriptions from './graphql/subscriptions';
 import { environment } from '../../../environments/environment';
 import * as utils from './utils';
-import { performGraphqlOperation } from './utils';
+import { performGraphqlOperation, subscribe } from './utils';
 
 import {
   Location,
@@ -26,7 +26,6 @@ Amplify.configure(environment.amplify);
 
 @Injectable({ providedIn: 'root' })
 export default class AmplifyStrategy {
-
   private subscriptions: {[k: string]: Unsubscribable} = {};
 
   private unsubscribe(subscription: Unsubscribable) {
@@ -49,16 +48,16 @@ export default class AmplifyStrategy {
   async user(): Promise<User> {
     try {
       const user = await Auth.currentAuthenticatedUser();
-      if (!user.attributes.picture) {
-        throw new Error();
+      let picture = 'http://www.gravatar.com/avatar';
+      if (user.attributes.picture) {
+        picture = user.attributes.picture;
+        const res = await Storage.get(picture, { download: true }) as any;
+        picture = await utils.blobToDataUrl(res.Body);
       }
-      const { picture } = user.attributes;
-      const res = await Storage.get(picture, { download: true }) as any;
-      const pictureUrl = await utils.blobToDataUrl(res.Body);
       return {
         username: user.attributes.preferred_username || user.username,
         email: user.attributes.email,
-        picture: pictureUrl
+        picture
       };
     } catch (err) {
       return {
@@ -179,7 +178,7 @@ export default class AmplifyStrategy {
 
   sessionById(sessionId: string): Observable<Session> {
     this.unsubscribe(this.subscriptions.sessionById);
-    const res = utils.subscribe<Session>(subscriptions.updatedSession);
+    const res = subscribe<Session>(subscriptions.updatedSession);
     this.subscriptions.sessionById = res.subscription;
     return merge(
       from(performGraphqlOperation(queries.getSession, { key: sessionId })),
@@ -192,12 +191,11 @@ export default class AmplifyStrategy {
       .pipe(utils.keysToIds());
   }
 
-
   //// Speakers
   speakerById(speakerId: string): Observable<Speaker> {
-    return from(performGraphqlOperation<Speaker>(queries.getSpeaker, {
-      key: speakerId
-    })).pipe(utils.keyToId());
+    const args = { key: speakerId };
+    return from(performGraphqlOperation<Speaker>(queries.getSpeaker, args))
+      .pipe(utils.keyToId());
   }
 
   listSpeakers(): Observable<Speaker[]> {
@@ -205,7 +203,6 @@ export default class AmplifyStrategy {
       .pipe(utils.keysToIds())
       .pipe(utils.sortByName());
   }
-
 
   //// Tracks
   listTracks(): Observable<Track[]> {
@@ -215,14 +212,11 @@ export default class AmplifyStrategy {
   //// Locations
   listLocations(): Observable<Location[]> {
     this.unsubscribe(this.subscriptions.listLocations);
-    const {
-      observable,
-      subscription
-    } = utils.subscribe<Location>(subscriptions.updatedLocation);
-    this.subscriptions.listLocations = subscription;
+    const res = subscribe<Location>(subscriptions.updatedLocation);
+    this.subscriptions.listLocations = res.subscription;
     return merge(
       from(performGraphqlOperation<Location[]>(queries.listLocations)),
-      observable.pipe(map((it) => [it]))
+      res.observable.pipe(map((it) => [it]))
     );
   }
 }

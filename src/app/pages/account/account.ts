@@ -2,6 +2,7 @@ import { AlertController } from '@ionic/angular';
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import Repository from '../../repository';
+import { User } from '../../models';
 
 @Component({
   selector: 'page-account',
@@ -9,7 +10,7 @@ import Repository from '../../repository';
   styleUrls: ['./account.scss'],
 })
 export class AccountPage {
-  user: any;
+  user: User;
 
   private setUser() {
     this.repository.user().then((user) => this.user = user);
@@ -29,7 +30,7 @@ export class AccountPage {
     const fileInput = ev.target as HTMLInputElement;
     const file = Array.from(fileInput.files).pop();
     await this.repository.updateUser({ profilePicture: file });
-    this.setUser();
+    this.user = await this.repository.user();
   }
 
   async changeUsername() {

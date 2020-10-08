@@ -29,7 +29,7 @@
 
       <ion-text color="danger">
         <p
-          [hidden]="username.valid || submitted == false"
+          [hidden]="username.valid || submitted === false"
           class="ion-padding-start">
           Username is required
         </p>
@@ -48,7 +48,7 @@
 
       <ion-text color="danger">
         <p
-          [hidden]="password.valid || submitted == false"
+          [hidden]="password.valid || submitted === false"
           class="ion-padding-start">
           Password is required
         </p>
@@ -59,6 +59,7 @@
       <ion-col>
         <ion-button
           (click)="onSignIn(signinForm)"
+          [disabled]="submitted === true"
           type="submit"
           expand="block">
           Sign In
@@ -67,6 +68,7 @@
       <ion-col>
         <ion-button
           (click)="onSignUp()"
+          [disabled]="submitted === true"
           color="light"
           expand="block">
           Sign Up

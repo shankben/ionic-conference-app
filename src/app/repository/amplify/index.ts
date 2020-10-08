@@ -29,20 +29,21 @@ export default class AmplifyStrategy {
 
   private subscriptions: {[k: string]: Unsubscribable} = {};
 
+  private unsubscribe(subscription: Unsubscribable) {
+    try {
+      subscription.unsubscribe();
+    } catch (err) {
+      // OK: Always unconditionally unsubscribe
+    }
+  }
+
   constructor() {
     window.addEventListener('themeChanged', (ev: CustomEvent) => {
       if (ev.detail.isDark) {
-        Object.values(this.subscriptions).forEach((it) => {
-          try {
-            it.unsubscribe();
-          } catch (err) {
-            // OK
-          }
-        });
+        Object.values(this.subscriptions).forEach((it) => this.unsubscribe(it));
       }
     });
   }
-
 
   //// User
   async user(): Promise<User> {
@@ -177,20 +178,12 @@ export default class AmplifyStrategy {
   }
 
   sessionById(sessionId: string): Observable<Session> {
-    try {
-      this.subscriptions.sessionById.unsubscribe();
-    } catch (err) {
-      // OK: Always unconditionally unsubscribe
-    }
-    const { observable, subscription } = utils.subscribe<Session>(
-      subscriptions.updatedSession
-    );
-    this.subscriptions.sessionById = subscription;
+    this.unsubscribe(this.subscriptions.sessionById);
+    const res = utils.subscribe<Session>(subscriptions.updatedSession);
+    this.subscriptions.sessionById = res.subscription;
     return merge(
-      from(performGraphqlOperation<Session>(queries.getSession, {
-        key: sessionId
-      })),
-      observable
+      from(performGraphqlOperation(queries.getSession, { key: sessionId })),
+      res.observable
     ).pipe(utils.keyToId());
   }
 
@@ -221,14 +214,11 @@ export default class AmplifyStrategy {
 
   //// Locations
   listLocations(): Observable<Location[]> {
-    try {
-      this.subscriptions.listLocations.unsubscribe();
-    } catch (err) {
-      // OK: Always unconditionally unsubscribe
-    }
-    const { observable, subscription } = utils.subscribe<Location>(
-      subscriptions.updatedLocation
-    );
+    this.unsubscribe(this.subscriptions.listLocations);
+    const {
+      observable,
+      subscription
+    } = utils.subscribe<Location>(subscriptions.updatedLocation);
     this.subscriptions.listLocations = subscription;
     return merge(
       from(performGraphqlOperation<Location[]>(queries.listLocations)),

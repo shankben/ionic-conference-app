@@ -49,7 +49,6 @@ export class SessionDetailPage {
       })).present();
       await this.repository.toggleLikeSession(this.session.id);
     } catch (err) {
-      console.log(err);
       (await this.toastCtrl.create({
         message: 'Sign in to like sessions!',
         duration: 3000

@@ -1,4 +1,6 @@
 #!/usr/bin/env node
+const fs = require("fs");
+const path = require("path");
 
 const AWS = require("aws-sdk");
 AWS.config.update({ region:
@@ -20,17 +22,11 @@ const getStackOutput = async (StackName, key) => JSON.parse(
 
 async function main() {
   const baseConfig = await getStackOutput(
-    "ionic-conference-demo-BaseStack",
-    "AmplifyConfigBaseOutput"
-  );
-  const apiConfig = await getStackOutput(
     "ionic-conference-demo-ApiStack",
-    "AmplifyConfigAppSyncOutput"
+    "AmplifyConfigOutput"
   );
-  console.log(JSON.stringify({
-    ...apiConfig,
-    ...baseConfig
-  }, null, 2));
+  fs.writeFileSync(path.join(__dirname, "..", "secrets", "amplify-config.ts"),
+    `export default ${JSON.stringify(baseConfig, null, 2)};`);
 }
 
 main().catch(console.error);

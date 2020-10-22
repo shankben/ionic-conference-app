@@ -69,6 +69,15 @@ export default class AmplifyStrategy {
     }
   }
 
+  async isSignedIn(): Promise<boolean> {
+    try {
+      const user = await Auth.currentAuthenticatedUser();
+      return Boolean(user) && !user.isAnonymous;
+    } catch (err) {
+      return false;
+    }
+  }
+
   async updateUser(userOptions: UserUpdate) {
     const user: CognitoUser = await Auth.currentAuthenticatedUser();
     const attributes = await Auth.userAttributes(user);
@@ -96,15 +105,6 @@ export default class AmplifyStrategy {
     }
   }
 
-  async isSignedIn(): Promise<boolean> {
-    try {
-      const user = await Auth.currentAuthenticatedUser();
-      return Boolean(user) && !user.isAnonymous;
-    } catch (err) {
-      return false;
-    }
-  }
-
   async signIn(userOptions: UserOptions): Promise<boolean> {
     const { email, password } = userOptions;
     try {
@@ -112,15 +112,6 @@ export default class AmplifyStrategy {
       return window.dispatchEvent(new CustomEvent('user:signin'));
     } catch (err) {
       console.error(err);
-    }
-  }
-
-  async signOut() {
-    try {
-      await Auth.signOut();
-      window.dispatchEvent(new CustomEvent('user:signout'));
-    } catch (err) {
-      // OK: Sign out unconditionally
     }
   }
 
@@ -136,6 +127,15 @@ export default class AmplifyStrategy {
       });
     } catch (err) {
       throw err;
+    }
+  }
+
+  async signOut() {
+    try {
+      await Auth.signOut();
+      window.dispatchEvent(new CustomEvent('user:signout'));
+    } catch (err) {
+      // OK: Sign out unconditionally
     }
   }
 

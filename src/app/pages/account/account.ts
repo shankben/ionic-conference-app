@@ -31,6 +31,7 @@ export class AccountPage {
     const file = Array.from(fileInput.files).pop();
     await this.repository.updateUser({ profilePicture: file });
     this.user = await this.repository.user();
+    window.dispatchEvent(new CustomEvent('user:profileUpdate'));
   }
 
   async changeUsername() {

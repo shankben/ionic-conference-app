@@ -15,7 +15,9 @@
   <form #signinForm="ngForm" novalidate>
     <ion-list>
       <ion-item>
-        <ion-label position="stacked" color="primary">Username</ion-label>
+        <ion-label position="stacked" color="primary">
+          {{ usernameLabel }}
+        </ion-label>
         <ion-input
           [(ngModel)]="userOptions.email"
           name="username"

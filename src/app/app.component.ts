@@ -10,7 +10,7 @@ import {
   AfterViewInit,
   ViewEncapsulation
 } from '@angular/core';
-import { DOCUMENT} from '@angular/common';
+import { DOCUMENT } from '@angular/common';
 import { Router } from '@angular/router';
 import { SwUpdate } from '@angular/service-worker';
 
@@ -46,6 +46,7 @@ export class AppComponent implements OnInit, AfterViewInit {
       this.signedIn = true;
       this.repository.user().then((user) => this.user = user);
     };
+    window.addEventListener('user:profileUpdate', updateUserStatus);
     window.addEventListener('user:signin', updateUserStatus);
     window.addEventListener('user:signup', updateUserStatus);
     window.addEventListener('user:signout', () => {

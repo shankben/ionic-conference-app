@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 const fs = require("fs");
+const path = require("path");
+
 const AWS = require("aws-sdk");
 AWS.config.update({ region:
   process.env.CDK_DEPLOY_REGION ||
@@ -7,6 +9,7 @@ AWS.config.update({ region:
   process.env.AWS_REGION ||
   "us-east-1"
 });
+
 const appSync = new AWS.AppSync();
 const cfn = new AWS.CloudFormation();
 
@@ -28,7 +31,9 @@ async function main() {
     )
   };
   const res = await appSync.getIntrospectionSchema(params).promise();
-  fs.writeFileSync("schema.graphql", res.schema.toString());
+  const filePath = path.join(__dirname, "..", "schema.graphql");
+  fs.writeFileSync(filePath, res.schema.toString());
+  console.log(`Wrote ${filePath}`);
 }
 
 main().catch(console.error);

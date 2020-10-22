@@ -1,0 +1,11 @@
+#!/bin/bash
+
+set -e
+
+amplify-graphql-docs-generator \
+  --schema schema.graphql \
+  --output src/app/repository/amplify/graphql \
+  --language typescript \
+  --separateFiles true
+
+echo "Wrote helpers to $(pwd -P)/src/app/repository/amplify/graphql"

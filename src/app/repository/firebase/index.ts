@@ -1,10 +1,9 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
-import { map, mergeAll } from 'rxjs/operators';
+import { mergeAll } from 'rxjs/operators';
 
-import { User as FirebaseUser } from 'firebase';
-import * as firebase from 'firebase/app';
+import firebase from 'firebase/app';
 import 'firebase/auth';
 import 'firebase/storage';
 import 'firebase/firestore';
@@ -23,7 +22,7 @@ import {
 @Injectable({ providedIn: 'root' })
 export default class FirebaseStrategy {
   constructor(private readonly afs: AngularFirestore) {
-    firebase.auth().onAuthStateChanged((user: FirebaseUser) => {
+    firebase.auth().onAuthStateChanged((user) => {
       if (user && !user.isAnonymous) {
         window.dispatchEvent(new CustomEvent('user:signin'));
       }

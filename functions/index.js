@@ -34,7 +34,7 @@ exports.updateLocationWeather = functions.pubsub
       name: `${OPEN_WEATHER_SECRET_NAME}/versions/latest`
     });
 
-    const openWeatherApiKey = accessResponse.payload.data.toString('utf8');
+    const openWeatherApiKey = accessResponse.payload.data.toString("utf8");
 
     const snapshot = await admin.firestore().collection("locations").get();
     return await Promise.all(snapshot.docs.map(async (it) => {

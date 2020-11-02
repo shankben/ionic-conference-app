@@ -46,177 +46,62 @@ export default class AmplifyStrategy {
 
   //// User
   async user(): Promise<User> {
-    try {
-      const user = await Auth.currentAuthenticatedUser();
-      let picture = 'http://www.gravatar.com/avatar';
-      if (user.attributes.picture) {
-        picture = user.attributes.picture;
-        const res = await Storage.get(picture, { download: true }) as any;
-        picture = await utils.blobToDataUrl(res.Body);
-      }
-      return {
-        username: user.attributes.preferred_username || user.username,
-        email: user.attributes.email,
-        picture
-      };
-    } catch (err) {
-      return {
-        isAnonymous: true,
-        email: 'anonymous',
-        username: 'anonymous',
-        picture: 'http://www.gravatar.com/avatar'
-      };
-    }
+    // Implement me!
   }
 
   async isSignedIn(): Promise<boolean> {
-    try {
-      const user = await Auth.currentAuthenticatedUser();
-      return Boolean(user) && !user.isAnonymous;
-    } catch (err) {
-      return false;
-    }
+    // Implement me!
   }
 
   async updateUser(userOptions: UserUpdate) {
-    const user: CognitoUser = await Auth.currentAuthenticatedUser();
-    const attributes = await Auth.userAttributes(user);
-    const sub = attributes.find((it: any) => it.Name === 'sub').getValue();
-    if (!user) {
-      return;
-    }
-    const { displayName, profilePicture } = userOptions;
-    if (displayName) {
-      await Auth.updateUserAttributes(user, {
-        preferred_username: displayName
-      });
-    }
-    if (profilePicture) {
-      try {
-        await Storage.put(`${sub}.jpg`, profilePicture, {
-          contentType: 'image/jpeg'
-        });
-        await Auth.updateUserAttributes(user, {
-          picture: `${sub}.jpg`
-        });
-      } catch (err) {
-        console.error(err);
-      }
-    }
+    // Implement me!
   }
 
-  async signIn(userOptions: UserOptions): Promise<boolean> {
-    const { email, password } = userOptions;
-    try {
-      await Auth.signIn(email, password);
-      return window.dispatchEvent(new CustomEvent('user:signin'));
-    } catch (err) {
-      console.error(err);
-    }
+  async signIn(userOptions: UserOptions) {
+    // Implement me!
   }
 
   async signUp(userOptions: UserOptions) {
-    const { username, email, password } = userOptions;
-    try {
-      await Auth.signUp({
-        username,
-        password,
-        attributes: {
-          email
-        }
-      });
-    } catch (err) {
-      throw err;
-    }
+    // Implement me!
   }
 
   async signOut() {
-    try {
-      await Auth.signOut();
-      window.dispatchEvent(new CustomEvent('user:signout'));
-    } catch (err) {
-      // OK: Sign out unconditionally
-    }
+    // Implement me!
   }
 
   async confirmSignup(username: string, code: string) {
-    try {
-      await Auth.confirmSignUp(username, code);
-    } catch (err) {
-      throw err;
-    }
+    // Implement me!
   }
 
   //// Sessions
   async toggleLikeSession(sessionId: string) {
-    const user = await this.user();
-    if (user.isAnonymous) {
-      throw new Error('Not signed in');
-    }
-    const session = await performGraphqlOperation<Session>(
-      queries.getSession,
-      { key: sessionId }
-    );
-    const likes = new Set(session.likes ?? []);
-    if (!likes.has(user.username)) {
-      likes.add(user.username);
-    } else {
-      likes.delete(user.username);
-    }
-    try {
-      await performGraphqlOperation<Session>(
-        mutations.updateSession,
-        {input: {
-          key: sessionId,
-          likes: Array.from(likes)
-        }}
-      );
-    } catch (err) {
-      console.error(err);
-    }
+    // Implement me!
   }
 
   sessionById(sessionId: string): Observable<Session> {
-    this.unsubscribe(this.subscriptions.sessionById);
-    const res = subscribe<Session>(subscriptions.updatedSession);
-    this.subscriptions.sessionById = res.subscription;
-    return merge(
-      from(performGraphqlOperation(queries.getSession, { key: sessionId })),
-      res.observable
-    ).pipe(utils.keyToId());
+    // Implement me!
   }
 
   listSessions(): Observable<Session[]> {
-    return from(performGraphqlOperation<Session[]>(queries.listSessions))
-      .pipe(utils.keysToIds());
+    // Implement me!
   }
 
   //// Speakers
   speakerById(speakerId: string): Observable<Speaker> {
-    const args = { key: speakerId };
-    return from(performGraphqlOperation<Speaker>(queries.getSpeaker, args))
-      .pipe(utils.keyToId());
+    // Implement me!
   }
 
   listSpeakers(): Observable<Speaker[]> {
-    return from(performGraphqlOperation<Speaker[]>(queries.listSpeakers))
-      .pipe(utils.keysToIds())
-      .pipe(utils.sortByName());
+    // Implement me!
   }
 
   //// Tracks
   listTracks(): Observable<Track[]> {
-    return from(performGraphqlOperation<Track[]>(queries.listTracks));
+    // Implement me!
   }
 
   //// Locations
   listLocations(): Observable<Location[]> {
-    this.unsubscribe(this.subscriptions.listLocations);
-    const res = subscribe<Location>(subscriptions.updatedLocation);
-    this.subscriptions.listLocations = res.subscription;
-    return merge(
-      from(performGraphqlOperation<Location[]>(queries.listLocations)),
-      res.observable.pipe(map((it) => [it]))
-    );
+    // Implement me!
   }
 }
